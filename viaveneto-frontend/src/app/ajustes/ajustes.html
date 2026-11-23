@@ -1,0 +1,59 @@
+<h1>Carta y mesas</h1>
+
+<section class="tarjeta">
+  <h2>Agregar un producto</h2>
+  <div class="fila-form">
+    <label>Nombre<input [(ngModel)]="nuevo.nombre" placeholder="Ej. Ravioles con crema" maxlength="80" /></label>
+    <label class="angosto">Precio<input type="number" inputmode="decimal" min="0" [(ngModel)]="nuevo.precio" placeholder="0" /></label>
+    <label>Categoría
+      <select [(ngModel)]="nuevo.categoriaId">
+        @for (categoria of categorias(); track categoria.id) {
+          <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+        }
+      </select>
+    </label>
+    <button class="primario" [disabled]="guardando()" (click)="agregarProducto()">Agregar</button>
+  </div>
+  <div class="fila-form">
+    <label>Categoría nueva<input [(ngModel)]="nuevaCategoria" placeholder="Ej. Minutas" maxlength="60" /></label>
+    <button [disabled]="guardando() || !nuevaCategoria.trim()" (click)="agregarCategoria()">Crear categoría</button>
+  </div>
+</section>
+
+@for (categoria of productosPorCategoria(); track categoria.id) {
+  <h2>{{ categoria.nombre }}</h2>
+  <div class="lista">
+    @for (producto of categoria.editables; track producto.id) {
+      <div class="producto tarjeta" [class.inactivo]="!producto.activo">
+        <label class="ancho">Nombre<input [(ngModel)]="producto.nombre" (ngModelChange)="marcarCambio(producto)" maxlength="80" /></label>
+        <label class="angosto">Precio<input type="number" inputmode="decimal" min="0" [(ngModel)]="producto.precio" (ngModelChange)="marcarCambio(producto)" /></label>
+        <label class="check">
+          <input type="checkbox" [(ngModel)]="producto.activo" (ngModelChange)="marcarCambio(producto)" />
+          {{ producto.activo ? 'Se vende' : 'No se vende' }}
+        </label>
+        <button class="primario" [disabled]="!producto.cambiado || guardando()" (click)="guardarProducto(producto)">Guardar</button>
+      </div>
+    } @empty {
+      <p class="cargando">Sin productos en esta categoría.</p>
+    }
+  </div>
+}
+
+<h2>Mesas del salón</h2>
+<section class="tarjeta">
+  <div class="mesas">
+    @for (mesa of mesas(); track mesa.id) {
+      <div class="mesa-chip">
+        <span>Mesa {{ mesa.numero }}</span>
+        <button [disabled]="mesa.ocupada || guardando()" (click)="quitarMesa(mesa)" [attr.aria-label]="'Quitar mesa ' + mesa.numero">
+          Quitar
+        </button>
+      </div>
+    }
+  </div>
+  <div class="fila-form">
+    <label class="angosto">Número<input type="number" min="1" [(ngModel)]="nuevaMesa" [placeholder]="siguienteMesa()" /></label>
+    <button class="primario" [disabled]="guardando()" (click)="agregarMesa()">Agregar mesa</button>
+  </div>
+  <p class="ayuda">Las mesas ocupadas no se pueden quitar hasta que se cierren.</p>
+</section>

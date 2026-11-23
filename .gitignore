@@ -1,0 +1,10 @@
+target/
+data/
+node_modules/
+.angular/
+dist/
+.DS_Store
+.idea/
+.vscode/
+*.iml
+src/main/resources/static/

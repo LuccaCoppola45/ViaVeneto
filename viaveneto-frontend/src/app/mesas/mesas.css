@@ -1,0 +1,28 @@
+.encabezado { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 8px; }
+.encabezado h1 { margin: 0; }
+.contadores { display: flex; gap: 8px; }
+.chip { padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 1rem; }
+.chip.libre { background: var(--libre-fondo); color: var(--libre); }
+.chip.ocupada { background: var(--ocupada-fondo); color: var(--ocupada); }
+
+.plano {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.mesa {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  min-height: 140px; padding: 12px;
+  background: var(--libre-fondo); border: 3px solid var(--libre); color: var(--libre);
+}
+.mesa.ocupada { background: var(--ocupada-fondo); border-color: var(--ocupada); color: var(--ocupada); }
+.numero { font-size: 2.6rem; font-weight: 800; line-height: 1; }
+.total { font-size: 1.25rem; font-weight: 800; color: var(--texto); font-variant-numeric: tabular-nums; }
+.detalle { font-size: 0.95rem; font-weight: 600; }
+
+@media (max-width: 520px) {
+  .plano { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .mesa { min-height: 120px; }
+}

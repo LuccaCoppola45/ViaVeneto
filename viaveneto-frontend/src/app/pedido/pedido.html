@@ -1,0 +1,104 @@
+<div class="encabezado">
+  <a class="volver" routerLink="/mesas" aria-label="Volver a las mesas">‹ Mesas</a>
+  <h1>{{ titulo() }}</h1>
+</div>
+
+@if (!pedido()) {
+  <p class="cargando">Cargando…</p>
+} @else {
+  @if (!abierto()) {
+    <div class="tarjeta cerrado">
+      <p>Esta mesa ya se cerró.</p>
+      <a class="boton-link" routerLink="/mesas">Volver a las mesas</a>
+    </div>
+  }
+
+  <div class="selector-vista" role="tablist">
+    <button role="tab" [class.elegido]="vista() === 'carta'" [attr.aria-selected]="vista() === 'carta'" (click)="vista.set('carta')">
+      Agregar
+    </button>
+    <button role="tab" [class.elegido]="vista() === 'cuenta'" [attr.aria-selected]="vista() === 'cuenta'" (click)="vista.set('cuenta')">
+      Pedido ({{ unidades() }})
+    </button>
+  </div>
+
+  <div class="columnas" [attr.data-vista]="vista()">
+    <section class="carta" aria-label="Carta">
+      <div class="categorias">
+        @for (categoria of carta(); track categoria.id) {
+          <button [class.elegido]="categoria.id === categoriaElegida()?.id" (click)="categoriaElegidaId.set(categoria.id)">
+            {{ categoria.nombre }}
+          </button>
+        }
+      </div>
+      <div class="productos">
+        @for (producto of categoriaElegida()?.productos; track producto.id) {
+          <button class="producto" [disabled]="!abierto()" (click)="agregar(producto)">
+            <span class="nombre">{{ producto.nombre }}</span>
+            <span class="precio">{{ producto.precio | plata }}</span>
+            @if (cantidadDe(producto); as cantidad) {
+              <span class="badge" aria-label="ya cargados">{{ cantidad }}</span>
+            }
+          </button>
+        } @empty {
+          <p class="cargando">No hay productos cargados en la carta.</p>
+        }
+      </div>
+    </section>
+
+    <section class="cuenta tarjeta" aria-label="Pedido de la mesa">
+      <h2>Pedido</h2>
+      @for (item of pedido()!.items; track item.id) {
+        <div class="item">
+          <div class="item-texto">
+            <span class="nombre">{{ item.nombre }}</span>
+            <span class="sub">{{ item.precioUnitario | plata }} c/u</span>
+          </div>
+          <div class="cantidad">
+            <button [disabled]="!abierto()" (click)="cambiar(item, -1)" [attr.aria-label]="'Sacar uno de ' + item.nombre">−</button>
+            <span class="numero">{{ item.cantidad }}</span>
+            <button [disabled]="!abierto()" (click)="cambiar(item, 1)" [attr.aria-label]="'Sumar uno de ' + item.nombre">+</button>
+          </div>
+          <span class="subtotal">{{ item.subtotal | plata }}</span>
+        </div>
+      } @empty {
+        <p class="vacio">Todavía no se cargó nada. Tocá los productos para agregarlos.</p>
+      }
+      <div class="total">
+        <span>Total</span>
+        <span>{{ pedido()!.total | plata }}</span>
+      </div>
+      @if (abierto()) {
+        <button class="primario cerrar" (click)="confirmandoCierre.set(true)">
+          {{ pedido()!.items.length ? 'Cerrar mesa' : 'Liberar mesa' }}
+        </button>
+      }
+    </section>
+  </div>
+
+  <div class="pie-movil">
+    <span>Total <strong>{{ pedido()!.total | plata }}</strong></span>
+    @if (vista() === 'carta') {
+      <button class="primario" (click)="vista.set('cuenta')">Ver pedido ({{ unidades() }})</button>
+    } @else {
+      <button (click)="vista.set('carta')">Agregar más</button>
+    }
+  </div>
+}
+
+@if (confirmandoCierre()) {
+  <div class="fondo-modal" (click)="confirmandoCierre.set(false)">
+    <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      @if (pedido()!.items.length) {
+        <p>¿Cerrar la {{ titulo().toLowerCase() }}?</p>
+        <p class="total-modal">Total: <strong>{{ pedido()!.total | plata }}</strong></p>
+      } @else {
+        <p>La {{ titulo().toLowerCase() }} no tiene nada cargado. ¿Liberarla?</p>
+      }
+      <div class="acciones">
+        <button (click)="confirmandoCierre.set(false)" [disabled]="cerrando()">No, volver</button>
+        <button class="primario" (click)="cerrar()" [disabled]="cerrando()">Sí, cerrar</button>
+      </div>
+    </div>
+  </div>
+}

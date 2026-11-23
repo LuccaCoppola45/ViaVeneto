@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "backend", "runtimeExecutable": "./mvnw", "runtimeArgs": ["-q", "spring-boot:run"], "port": 8081 },
+    { "name": "frontend", "runtimeExecutable": "npm", "runtimeArgs": ["--prefix", "viaveneto-frontend", "start", "--", "--port", "4300"], "port": 4300 }
+  ]
+}
