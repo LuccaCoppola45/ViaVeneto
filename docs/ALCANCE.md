@@ -31,6 +31,7 @@ Lo usan personas sin conocimientos técnicos: botones grandes, pocos pasos, espa
 ## Estado
 
 - [x] Parte 1: mesas y pedidos por mesa (con carta editable).
+- [x] Plano del local por sector (planta baja 5, arriba 4, cerramiento 6, afuera 4) y modo "Acomodar salón".
 - [ ] Parte 2: para llevar y delivery.
 - [ ] Parte 3: stock y alertas.
 - [ ] Parte 4: ticket, medios de pago y caja del día.

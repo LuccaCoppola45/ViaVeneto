@@ -14,3 +14,6 @@ label.check input { width: 28px; height: 28px; min-height: 0; }
 .mesa-chip { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 14px; border: 2px solid var(--borde); border-radius: var(--radio); font-weight: 700; }
 .mesa-chip button { min-height: 48px; padding: 0 12px; font-size: 0.95rem; }
 .ayuda { color: var(--suave); margin: 0; font-size: 0.95rem; }
+.acomodar { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; color: var(--texto); text-decoration: none; border: 2px solid var(--vino); }
+.acomodar .icono { font-size: 2.2rem; }
+.acomodar .flecha { margin-left: auto; font-size: 2rem; color: var(--vino); }

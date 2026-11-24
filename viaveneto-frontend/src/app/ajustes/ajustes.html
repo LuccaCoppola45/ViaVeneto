@@ -1,5 +1,11 @@
 <h1>Carta y mesas</h1>
 
+<a class="tarjeta acomodar" routerLink="/salon">
+  <span class="icono">🗺️</span>
+  <span><strong>Acomodar el salón</strong><br />Ubicá las mesas, la puerta, la barra y la escalera como están en el local.</span>
+  <span class="flecha">›</span>
+</a>
+
 <section class="tarjeta">
   <h2>Agregar un producto</h2>
   <div class="fila-form">
@@ -55,5 +61,5 @@
     <label class="angosto">Número<input type="number" min="1" [(ngModel)]="nuevaMesa" [placeholder]="siguienteMesa()" /></label>
     <button class="primario" [disabled]="guardando()" (click)="agregarMesa()">Agregar mesa</button>
   </div>
-  <p class="ayuda">Las mesas ocupadas no se pueden quitar hasta que se cierren.</p>
+  <p class="ayuda">Las mesas nuevas aparecen en la planta baja: después ubicalas desde “Acomodar el salón”. Las mesas ocupadas no se pueden quitar hasta que se cierren.</p>
 </section>

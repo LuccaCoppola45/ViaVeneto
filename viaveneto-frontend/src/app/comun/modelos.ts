@@ -1,6 +1,10 @@
 export type MesaResumen = {
   id: number;
   numero: number;
+  sectorId: number | null;
+  x: number;
+  y: number;
+  vertical: boolean;
   ocupada: boolean;
   pedidoId: number | null;
   abiertaDesde: string | null;
@@ -46,3 +50,20 @@ export type Categoria = {
 };
 
 export type ProductoForm = Omit<Producto, 'id'>;
+
+export type TipoElemento =
+  | 'PUERTA' | 'BARRA' | 'CAJA' | 'COCINA' | 'ESCALERA' | 'BANIO' | 'VENTANA' | 'PARED' | 'PLANTA';
+
+export type Elemento = { tipo: TipoElemento; x: number; y: number; ancho: number; alto: number };
+
+export type Sector = { id: number; nombre: string; orden: number; elementos: Elemento[] };
+
+/** Tamaño del plano y de las mesas, en las unidades del backend. */
+export type Medidas = { ancho: number; alto: number; mesaLargo: number; mesaCorto: number };
+
+export type Salon = { medidas: Medidas; sectores: Sector[] };
+
+export type PlanoForm = {
+  mesas: { id: number; sectorId: number; x: number; y: number; vertical: boolean }[];
+  elementos: (Elemento & { sectorId: number })[];
+};

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -34,6 +35,11 @@ public class MesaController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public MesaResumen agregar(@Valid @RequestBody NuevaMesa nueva) {
 		return mesaService.agregar(nueva);
+	}
+
+	@PutMapping("/{id}/numero")
+	public MesaResumen cambiarNumero(@PathVariable Long id, @Valid @RequestBody NuevoNumero nuevo) {
+		return mesaService.cambiarNumero(id, nuevo);
 	}
 
 	@DeleteMapping("/{id}")

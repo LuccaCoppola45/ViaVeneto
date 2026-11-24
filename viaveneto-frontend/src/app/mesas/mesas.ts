@@ -3,67 +3,71 @@ import { Router } from '@angular/router';
 import { Api } from '../comun/api';
 import { Avisos } from '../comun/avisos';
 import { PlataPipe, tiempoDesde } from '../comun/formato';
-import { MesaResumen } from '../comun/modelos';
+import { MesaResumen, Salon, Sector } from '../comun/modelos';
 import { refrescarCadaRato } from '../comun/refresco';
+import { ELEMENTOS, MesaDibujo, estiloPieza, tamanioMesa } from '../salon/dibujo';
+import { sectorElegido } from '../salon/sector-elegido';
+
+const FINO = 50;
 
 @Component({
   selector: 'app-mesas',
-  imports: [PlataPipe],
+  imports: [PlataPipe, MesaDibujo],
   styleUrl: './mesas.css',
-  template: `
-    <div class="encabezado">
-      <h1>Mesas</h1>
-      @if (mesas().length) {
-        <div class="contadores">
-          <span class="chip libre">{{ libres() }} libres</span>
-          <span class="chip ocupada">{{ ocupadas() }} ocupadas</span>
-        </div>
-      }
-    </div>
-
-    @if (cargando()) {
-      <p class="cargando">Cargando mesas…</p>
-    } @else if (!mesas().length) {
-      <p class="cargando">Todavía no hay mesas. Agregalas desde “Carta y mesas”.</p>
-    }
-
-    <div class="plano">
-      @for (mesa of mesas(); track mesa.id) {
-        <button
-          class="mesa"
-          [class.ocupada]="mesa.ocupada"
-          [disabled]="abriendo() === mesa.id"
-          (click)="entrar(mesa)"
-          [attr.aria-label]="'Mesa ' + mesa.numero + (mesa.ocupada ? ', ocupada' : ', libre')"
-        >
-          <span class="numero">{{ mesa.numero }}</span>
-          @if (mesa.ocupada) {
-            <span class="total">{{ mesa.total | plata }}</span>
-            <span class="detalle">{{ mesa.cantidadItems }} u. · {{ hace(mesa) }}</span>
-          } @else {
-            <span class="detalle">Libre</span>
-          }
-        </button>
-      }
-    </div>
-  `,
+  templateUrl: './mesas.html',
 })
 export class Mesas {
   private readonly api = inject(Api);
   private readonly avisos = inject(Avisos);
   private readonly router = inject(Router);
+  private readonly sector = sectorElegido();
 
+  protected readonly salon = signal<Salon | null>(null);
   protected readonly mesas = signal<MesaResumen[]>([]);
-  protected readonly cargando = signal(true);
   protected readonly abriendo = signal<number | null>(null);
   private readonly ahora = signal(Date.now());
 
-  protected readonly ocupadas = computed(() => this.mesas().filter((m) => m.ocupada).length);
-  protected readonly libres = computed(() => this.mesas().length - this.ocupadas());
+  protected readonly ELEMENTOS = ELEMENTOS;
+
+  protected readonly sectorActual = computed<Sector | undefined>(() => {
+    const sectores = this.salon()?.sectores ?? [];
+    return sectores.find((s) => s.id === this.sector.elegido()) ?? sectores[0];
+  });
+
+  /** Las mesas sin sector (creadas antes de que existiera el plano) se muestran en el primero. */
+  private readonly sectorDeMesa = (mesa: MesaResumen) => mesa.sectorId ?? this.salon()?.sectores[0]?.id;
+
+  protected readonly mesasDelSector = computed(() =>
+    this.mesas().filter((m) => this.sectorDeMesa(m) === this.sectorActual()?.id),
+  );
+
+  protected readonly libresTotal = computed(() => this.mesas().filter((m) => !m.ocupada).length);
 
   constructor() {
-    this.cargar();
-    refrescarCadaRato(() => this.cargar());
+    this.cargarTodo();
+    refrescarCadaRato(() => this.cargarMesas());
+  }
+
+  protected elegirSector(sector: Sector) {
+    this.sector.elegir(sector.id);
+  }
+
+  protected ocupadasEn(sector: Sector) {
+    return this.mesas().filter((m) => m.ocupada && this.sectorDeMesa(m) === sector.id).length;
+  }
+
+  protected estiloMesa(mesa: MesaResumen) {
+    const medidas = this.salon()!.medidas;
+    const { ancho, alto } = tamanioMesa(medidas, mesa.vertical);
+    return estiloPieza(medidas, mesa.x, mesa.y, ancho, alto);
+  }
+
+  protected estiloElemento(e: { x: number; y: number; ancho: number; alto: number }) {
+    return estiloPieza(this.salon()!.medidas, e.x, e.y, e.ancho, e.alto);
+  }
+
+  protected esFino(e: { ancho: number; alto: number }) {
+    return Math.min(e.ancho, e.alto) < FINO;
   }
 
   protected hace(mesa: MesaResumen) {
@@ -86,14 +90,22 @@ export class Mesas {
     }
   }
 
-  private async cargar() {
+  private async cargarTodo() {
+    try {
+      const [salon, mesas] = await Promise.all([this.api.salon(), this.api.mesas()]);
+      this.salon.set(salon);
+      this.mesas.set(mesas);
+    } catch (error) {
+      this.avisos.error((error as Error).message);
+    }
+  }
+
+  private async cargarMesas() {
     try {
       this.mesas.set(await this.api.mesas());
       this.ahora.set(Date.now());
-    } catch (error) {
-      this.avisos.error((error as Error).message);
-    } finally {
-      this.cargando.set(false);
+    } catch {
+      // El próximo refresco lo reintenta; no llenamos la pantalla de avisos.
     }
   }
 }

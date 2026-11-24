@@ -105,3 +105,79 @@ input, select {
   .barra .marca { font-size: 1.1rem; }
   .barra nav a { padding: 0 10px; }
 }
+
+/* ---------- Plano del local (pantalla de mesas y "Acomodar salón") ---------- */
+.sectores { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+.sectores button { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; min-height: 72px; font-size: 1.15rem; }
+.sectores button small { font-size: 0.9rem; font-weight: 600; opacity: 0.85; }
+.sectores button.elegido { background: var(--vino); border-color: var(--vino); color: #fff; }
+
+.plano {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 1000 / 625;
+  width: min(100%, calc((100dvh - 250px) * 1.6));
+  min-width: 300px;
+  margin: 0 auto;
+  background:
+    linear-gradient(var(--piso-linea) 1px, transparent 1px) 0 0 / 5% 8%,
+    linear-gradient(90deg, var(--piso-linea) 1px, transparent 1px) 0 0 / 5% 8%,
+    var(--piso);
+  border: 6px solid #4a3f36;
+  border-radius: 10px;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+:root { --piso: #f3ead9; --piso-linea: rgba(120, 95, 60, 0.07); }
+
+.pieza { position: absolute; }
+
+.elemento {
+  display: flex; align-items: center; justify-content: center; gap: 0.4em;
+  border-radius: 6px; font-weight: 700; color: #4a3f36; overflow: hidden; text-align: center;
+  font-size: clamp(10px, 1.7cqw, 18px); line-height: 1.1;
+  background: #e2d4bd; border: 2px solid #b9a383;
+}
+.elemento .icono { font-size: 1.4em; }
+.elemento.PUERTA { background: #a0683a; border-color: #7b4d28; color: #fff; }
+.elemento.BARRA, .elemento.CAJA { background: #b98b5e; border-color: #8a6440; color: #fff; }
+.elemento.COCINA { background: #d9d6d0; border-color: #a8a39b; }
+.elemento.ESCALERA { background: repeating-linear-gradient(0deg, #d8c9b1 0 12%, #c4b294 12% 16%); }
+.elemento.BANIO { background: #dfe8ee; border-color: #a9bccb; }
+.elemento.VENTANA { background: #cde6f5; border-color: #8fbcd8; color: #2b5d7d; }
+.elemento.PARED { background: #6e6258; border-color: #6e6258; color: #fff; }
+.elemento.PLANTA { background: transparent; border: none; }
+.elemento.PLANTA .icono { font-size: 2.6em; }
+/* Elementos finitos (puertas, ventanas, paredes): solo el nombre, más chico, y parado si el elemento está parado */
+.elemento.fino { font-size: clamp(9px, 1.3cqw, 14px); }
+.elemento.fino .icono { display: none; }
+.elemento.fino.parado .nombre { writing-mode: vertical-rl; }
+
+.mesa-dibujo { position: absolute; display: block; }
+.mesa-dibujo .silla { position: absolute; width: 26%; height: 15%; border-radius: 40%; background: #8a6440; }
+.mesa-dibujo .s1 { top: 0; left: 14%; } .mesa-dibujo .s2 { top: 0; right: 14%; }
+.mesa-dibujo .s3 { bottom: 0; left: 14%; } .mesa-dibujo .s4 { bottom: 0; right: 14%; }
+.mesa-dibujo.vertical .silla { width: 15%; height: 26%; }
+.mesa-dibujo.vertical .s1 { top: 14%; left: 0; } .mesa-dibujo.vertical .s2 { top: auto; bottom: 14%; left: 0; right: auto; }
+.mesa-dibujo.vertical .s3 { top: 14%; bottom: auto; right: 0; left: auto; } .mesa-dibujo.vertical .s4 { bottom: 14%; right: 0; left: auto; }
+.mesa-dibujo .tablero {
+  position: absolute; inset: 11% 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 8px; border: 3px solid var(--libre); background: var(--libre-fondo); color: var(--libre);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); line-height: 1.05; overflow: hidden;
+}
+.mesa-dibujo.vertical .tablero { inset: 0 11%; }
+.mesa-dibujo.ocupada .tablero { border-color: var(--ocupada); background: var(--ocupada-fondo); color: var(--ocupada); }
+.mesa-dibujo.ocupada .silla { background: var(--ocupada); }
+.mesa-dibujo .numero { font-size: clamp(16px, 4.2cqw, 46px); font-weight: 800; }
+.mesa-dibujo .total { font-size: clamp(10px, 1.8cqw, 20px); font-weight: 800; color: var(--texto); font-variant-numeric: tabular-nums; }
+.mesa-dibujo .detalle { font-size: clamp(9px, 1.4cqw, 15px); font-weight: 600; }
+
+/* Celular: las mesas quedan chicas, así que muestran solo el número y el color */
+@media (max-width: 600px) {
+  .mesa-dibujo .total, .mesa-dibujo .detalle { display: none; }
+  .sectores button { min-height: 60px; padding: 0 14px; font-size: 1rem; }
+  .sectores button small { font-size: 0.8rem; }
+  .plano { border-width: 4px; }
+}

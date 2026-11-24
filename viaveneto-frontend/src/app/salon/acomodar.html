@@ -1,0 +1,71 @@
+<div class="encabezado">
+  <a class="volver" routerLink="/carta">‹ Volver</a>
+  <h1>Acomodar salón</h1>
+</div>
+<p class="instrucciones">Arrastrá las mesas y las cosas del local a su lugar. Tocá una para girarla, cambiarle el número o borrarla.</p>
+
+@if (!medidas()) {
+  <p class="cargando">Cargando el salón…</p>
+} @else {
+  <div class="sectores" role="tablist">
+    @for (sector of sectores(); track sector.id) {
+      <button role="tab" [class.elegido]="sector.id === sectorActual()?.id" (click)="elegirSector(sector)">{{ sector.nombre }}</button>
+    }
+    <button (click)="agregarSector()">+ Sector</button>
+  </div>
+
+  <div class="plano acomodando" #plano (pointerdown)="tocarFondo()"
+       (pointermove)="moverArrastre($event)" (pointerup)="terminarArrastre()" (pointercancel)="terminarArrastre()">
+    @for (elemento of elementosDelSector(); track elemento.clave) {
+      <div class="pieza elemento" [class]="elemento.tipo" [class.fino]="esFino(elemento)" [class.parado]="elemento.alto > elemento.ancho" [class.elegida]="esElementoElegido(elemento)"
+           [style]="estiloElemento(elemento)" (pointerdown)="empezarArrastre($event, elemento)">
+        @if (ELEMENTOS[elemento.tipo].icono) { <span class="icono">{{ ELEMENTOS[elemento.tipo].icono }}</span> }
+        <span class="nombre">{{ ELEMENTOS[elemento.tipo].nombre }}</span>
+        @if (esElementoElegido(elemento)) {
+          <span class="estirar" aria-label="Agrandar o achicar" (pointerdown)="empezarArrastre($event, elemento, 'estirar')"></span>
+        }
+      </div>
+    }
+    @for (mesa of mesasDelSector(); track mesa.id) {
+      <app-mesa-dibujo class="pieza movible" [vertical]="mesa.vertical" [class.ocupada]="mesa.ocupada" [class.elegida]="esMesaElegida(mesa)"
+                       [style]="estiloMesa(mesa)" (pointerdown)="empezarArrastre($event, mesa)">
+        <span class="numero">{{ mesa.numero }}</span>
+      </app-mesa-dibujo>
+    }
+  </div>
+
+  <div class="panel tarjeta">
+    @if (mesaElegida(); as mesa) {
+      <strong class="titulo-panel">Mesa {{ mesa.numero }}</strong>
+      <div class="botones">
+        <button (click)="girarMesa(mesa)">↻ Girar</button>
+        <button (click)="cambiarNumero(mesa)">Cambiar número</button>
+        @for (otro of otrosSectores(); track otro.id) {
+          <button (click)="moverMesaA(mesa, otro)">Pasar a {{ otro.nombre }}</button>
+        }
+      </div>
+    } @else if (elementoElegido(); as elemento) {
+      <strong class="titulo-panel">{{ ELEMENTOS[elemento.tipo].nombre }}</strong>
+      <div class="botones">
+        <button (click)="girarElemento(elemento)">↻ Girar</button>
+        <button class="peligro" (click)="borrarElemento(elemento)">Borrar</button>
+      </div>
+      <p class="ayuda-panel">Para agrandarlo o achicarlo, arrastrá el círculo de la esquina.</p>
+    } @else {
+      <strong class="titulo-panel">Agregar a {{ sectorActual()?.nombre }}</strong>
+      <div class="botones">
+        <button (click)="agregarMesa()">+ Mesa</button>
+        @for (tipo of TIPOS; track tipo) {
+          <button (click)="agregarElemento(tipo)">{{ ELEMENTOS[tipo].icono }} {{ ELEMENTOS[tipo].nombre }}</button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="guardar">
+    <button [disabled]="!cambios() || guardando()" (click)="descartar()">Descartar</button>
+    <button class="primario" [disabled]="!cambios() || guardando()" (click)="guardar()">
+      {{ cambios() ? 'Guardar cambios' : 'Todo guardado' }}
+    </button>
+  </div>
+}

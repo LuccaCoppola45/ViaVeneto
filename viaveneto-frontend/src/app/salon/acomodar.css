@@ -1,0 +1,31 @@
+.encabezado { display: flex; align-items: center; gap: 12px; }
+.encabezado h1 { margin: 0; }
+.volver {
+  display: inline-flex; align-items: center; min-height: 56px; padding: 0 16px;
+  border: 2px solid var(--borde); border-radius: var(--radio); background: #fff;
+  color: var(--texto); text-decoration: none; font-weight: 700;
+}
+.instrucciones { color: var(--suave); margin: 8px 0 12px; }
+
+.plano.acomodando { width: min(100%, calc((100dvh - 400px) * 1.6)); }
+.acomodando .pieza { cursor: grab; touch-action: none; }
+.acomodando .pieza:active { cursor: grabbing; }
+.elegida { outline: 4px solid #2563eb; outline-offset: 2px; z-index: 5; border-radius: 8px; }
+.estirar {
+  position: absolute; right: -2px; bottom: -2px; width: 28px; height: 28px; border-radius: 50%;
+  background: #2563eb; border: 3px solid #fff; cursor: nwse-resize; touch-action: none;
+}
+.elemento.elegida { overflow: visible; }
+
+.panel { margin-top: 14px; }
+.titulo-panel { display: block; margin-bottom: 10px; font-size: 1.15rem; }
+.botones { display: flex; flex-wrap: wrap; gap: 8px; }
+.botones button { min-height: 56px; }
+.ayuda-panel { margin: 10px 0 0; color: var(--suave); font-size: 0.95rem; }
+
+.guardar {
+  position: sticky; bottom: 0; z-index: 15;
+  display: flex; justify-content: flex-end; gap: 10px;
+  margin: 14px -16px 0; padding: 12px 16px; background: var(--fondo); border-top: 1px solid var(--borde);
+}
+.guardar .primario { min-width: 200px; }

@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { Api } from '../comun/api';
 import { Avisos } from '../comun/avisos';
 import { Categoria, MesaResumen, Producto } from '../comun/modelos';
@@ -9,7 +10,7 @@ type ProductoEditable = Producto & { cambiado: boolean };
 /** Pantalla para el dueño o la encargada: precios, productos nuevos y cantidad de mesas. */
 @Component({
   selector: 'app-ajustes',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   styleUrl: './ajustes.css',
   templateUrl: './ajustes.html',
 })

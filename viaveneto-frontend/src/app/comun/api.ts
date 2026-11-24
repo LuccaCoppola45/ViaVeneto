@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
-import { Categoria, MesaResumen, PedidoDetalle, Producto, ProductoForm } from './modelos';
+import { Categoria, MesaResumen, PedidoDetalle, PlanoForm, Producto, ProductoForm, Salon, Sector } from './modelos';
 
 /** Llamadas al backend. Devuelven promesas y los errores llegan como Error con un mensaje listo para mostrar. */
 @Injectable({ providedIn: 'root' })
@@ -9,9 +9,16 @@ export class Api {
   private readonly http = inject(HttpClient);
 
   mesas = () => this.pedir(this.http.get<MesaResumen[]>('/api/mesas'));
-  agregarMesa = (numero: number) => this.pedir(this.http.post<MesaResumen>('/api/mesas', { numero }));
+  agregarMesa = (numero: number, sectorId?: number) =>
+    this.pedir(this.http.post<MesaResumen>('/api/mesas', { numero, sectorId }));
+  cambiarNumeroMesa = (id: number, numero: number) =>
+    this.pedir(this.http.put<MesaResumen>(`/api/mesas/${id}/numero`, { numero }));
   quitarMesa = (id: number) => this.pedir(this.http.delete<void>(`/api/mesas/${id}`));
   abrirMesa = (id: number) => this.pedir(this.http.post<PedidoDetalle>(`/api/mesas/${id}/abrir`, {}));
+
+  salon = () => this.pedir(this.http.get<Salon>('/api/salon'));
+  guardarPlano = (form: PlanoForm) => this.pedir(this.http.put<Salon>('/api/salon', form));
+  crearSector = (nombre: string) => this.pedir(this.http.post<Sector>('/api/salon/sectores', { nombre }));
 
   pedido = (id: number) => this.pedir(this.http.get<PedidoDetalle>(`/api/pedidos/${id}`));
   agregarItem = (pedidoId: number, productoId: number, cantidad = 1) =>
