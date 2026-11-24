@@ -2,7 +2,7 @@
   <a class="volver" routerLink="/carta">‹ Volver</a>
   <h1>Acomodar salón</h1>
 </div>
-<p class="instrucciones">Arrastrá las mesas y las cosas del local a su lugar. Tocá una para girarla, cambiarle el número o borrarla.</p>
+<p class="instrucciones">Arrastrá las mesas y las cosas del local a su lugar. Tocá una y usá el botón <strong>↻</strong> para ponerla vertical u horizontal.</p>
 
 @if (!medidas()) {
   <p class="cargando">Cargando el salón…</p>
@@ -14,31 +14,11 @@
     <button (click)="agregarSector()">+ Sector</button>
   </div>
 
-  <div class="plano acomodando" #plano (pointerdown)="tocarFondo()"
-       (pointermove)="moverArrastre($event)" (pointerup)="terminarArrastre()" (pointercancel)="terminarArrastre()">
-    @for (elemento of elementosDelSector(); track elemento.clave) {
-      <div class="pieza elemento" [class]="elemento.tipo" [class.fino]="esFino(elemento)" [class.parado]="elemento.alto > elemento.ancho" [class.elegida]="esElementoElegido(elemento)"
-           [style]="estiloElemento(elemento)" (pointerdown)="empezarArrastre($event, elemento)">
-        @if (ELEMENTOS[elemento.tipo].icono) { <span class="icono">{{ ELEMENTOS[elemento.tipo].icono }}</span> }
-        <span class="nombre">{{ ELEMENTOS[elemento.tipo].nombre }}</span>
-        @if (esElementoElegido(elemento)) {
-          <span class="estirar" aria-label="Agrandar o achicar" (pointerdown)="empezarArrastre($event, elemento, 'estirar')"></span>
-        }
-      </div>
-    }
-    @for (mesa of mesasDelSector(); track mesa.id) {
-      <app-mesa-dibujo class="pieza movible" [vertical]="mesa.vertical" [mesitas]="mesa.mesitas" [class.ocupada]="mesa.ocupada" [class.elegida]="esMesaElegida(mesa)"
-                       [style]="estiloMesa(mesa)" (pointerdown)="empezarArrastre($event, mesa)">
-        <span class="numero">{{ mesa.etiqueta }}</span>
-      </app-mesa-dibujo>
-    }
-  </div>
-
   <div class="panel tarjeta">
     @if (mesaElegida(); as mesa) {
       <strong class="titulo-panel">Mesa {{ mesa.etiqueta }} · {{ mesa.mesitas * 2 }} lugares</strong>
       <div class="botones">
-        <button (click)="girarMesa(mesa)">↻ Girar</button>
+        <button (click)="girarMesa(mesa)">↻ {{ mesa.vertical ? 'Poner horizontal' : 'Poner vertical' }}</button>
         <button (click)="cambiarNumero(mesa)">Cambiar número</button>
         @for (otro of otrosSectores(); track otro.id) {
           <button (click)="moverMesaA(mesa, otro)">Pasar a {{ otro.nombre }}</button>
@@ -59,6 +39,35 @@
           <button (click)="agregarElemento(tipo)">{{ ELEMENTOS[tipo].icono }} {{ ELEMENTOS[tipo].nombre }}</button>
         }
       </div>
+    }
+  </div>
+
+  <div class="plano acomodando" #plano [style]="estiloPlano()" (pointerdown)="tocarFondo()"
+       (pointermove)="moverArrastre($event)" (pointerup)="terminarArrastre()" (pointercancel)="terminarArrastre()">
+    @for (elemento of elementosDelSector(); track elemento.clave) {
+      <div class="pieza elemento" [class]="elemento.tipo" [class.fino]="esFino(elemento)" [class.parado]="elemento.alto > elemento.ancho" [class.elegida]="esElementoElegido(elemento)"
+           [style]="estiloElemento(elemento)" (pointerdown)="empezarArrastre($event, elemento)">
+        @if (ELEMENTOS[elemento.tipo].icono) { <span class="icono">{{ ELEMENTOS[elemento.tipo].icono }}</span> }
+        <span class="nombre">{{ ELEMENTOS[elemento.tipo].nombre }}</span>
+        @if (esElementoElegido(elemento)) {
+          <span class="estirar" aria-label="Agrandar o achicar" (pointerdown)="empezarArrastre($event, elemento, 'estirar')"></span>
+        }
+      </div>
+    }
+    @for (mesa of mesasDelSector(); track mesa.id) {
+      <app-mesa-dibujo class="pieza movible" [vertical]="mesa.vertical" [mesitas]="mesa.mesitas" [class.ocupada]="mesa.ocupada" [class.elegida]="esMesaElegida(mesa)"
+                       [style]="estiloMesa(mesa)" (pointerdown)="empezarArrastre($event, mesa)">
+        <span class="numero">{{ mesa.etiqueta }}</span>
+      </app-mesa-dibujo>
+    }
+    @if (mesaElegida(); as mesa) {
+      @if (mesa.sectorId === sectorActual()?.id) {
+        <button class="girar-rapido" [style]="estiloGirar(estiloMesa(mesa))" (pointerdown)="$event.stopPropagation()"
+                (click)="girarMesa(mesa)" [attr.aria-label]="mesa.vertical ? 'Poner horizontal' : 'Poner vertical'">↻</button>
+      }
+    } @else if (elementoElegido(); as elemento) {
+      <button class="girar-rapido" [style]="estiloGirar(estiloElemento(elemento))" (pointerdown)="$event.stopPropagation()"
+              (click)="girarElemento(elemento)" aria-label="Girar">↻</button>
     }
   </div>
 

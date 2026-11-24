@@ -26,6 +26,12 @@ export const estiloPieza = (medidas: Medidas, x: number, y: number, ancho: numbe
   height: `${(alto / medidas.alto) * 100}%`,
 });
 
+/** Proporción del plano para el CSS: así el dibujo nunca se deforma si cambia el tamaño en el backend. */
+export const estiloPlano = (medidas: Medidas) => ({
+  '--plano-ratio': `${medidas.ancho} / ${medidas.alto}`,
+  '--plano-proporcion': medidas.ancho / medidas.alto,
+});
+
 /** Las mesitas van en fila: cuantas más tiene la mesa, más larga es. */
 export const tamanioMesa = (medidas: Medidas, vertical: boolean, mesitas: number) => {
   const largo = medidas.mesitaLargo * mesitas;

@@ -7,7 +7,7 @@
 }
 .instrucciones { color: var(--suave); margin: 8px 0 12px; }
 
-.plano.acomodando { width: min(100%, calc((100dvh - 400px) * 1.6)); }
+.plano.acomodando { width: min(100%, max(560px, calc((100dvh - 430px) * var(--plano-proporcion, 1.25)))); }
 .acomodando .pieza { cursor: grab; touch-action: none; }
 .acomodando .pieza:active { cursor: grabbing; }
 .elegida { outline: 4px solid #2563eb; outline-offset: 2px; z-index: 5; border-radius: 8px; }
@@ -17,7 +17,13 @@
 }
 .elemento.elegida { overflow: visible; }
 
-.panel { margin-top: 14px; }
+.panel { margin-bottom: 12px; min-height: 132px; } /* alto fijo: así el plano no salta al elegir otra cosa */
+.girar-rapido {
+  position: absolute; z-index: 6; transform: translate(-50%, -50%);
+  width: 48px; height: 48px; min-height: 0; padding: 0; border-radius: 50%;
+  background: #2563eb; border: 3px solid #fff; color: #fff; font-size: 1.6rem; line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
 .titulo-panel { display: block; margin-bottom: 10px; font-size: 1.15rem; }
 .botones { display: flex; flex-wrap: wrap; gap: 8px; }
 .botones button { min-height: 56px; }

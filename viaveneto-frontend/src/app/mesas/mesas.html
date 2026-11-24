@@ -51,7 +51,7 @@
   }
 
   @if (sectorActual(); as sector) {
-    <div class="plano" [class.modo-arreglo]="arreglo()" [attr.aria-label]="'Plano de ' + sector.nombre">
+    <div class="plano" [class.modo-arreglo]="arreglo()" [style]="estiloPlano()" [attr.aria-label]="'Plano de ' + sector.nombre">
       @for (elemento of sector.elementos; track $index) {
         <div class="pieza elemento" [class]="elemento.tipo" [class.fino]="esFino(elemento)" [class.parado]="elemento.alto > elemento.ancho" [style]="estiloElemento(elemento)" aria-hidden="true">
           @if (ELEMENTOS[elemento.tipo].icono) { <span class="icono">{{ ELEMENTOS[elemento.tipo].icono }}</span> }

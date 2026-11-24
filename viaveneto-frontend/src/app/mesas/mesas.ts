@@ -5,7 +5,7 @@ import { Avisos } from '../comun/avisos';
 import { PlataPipe, tiempoDesde } from '../comun/formato';
 import { MesaResumen, Salon, Sector } from '../comun/modelos';
 import { refrescarCadaRato } from '../comun/refresco';
-import { ELEMENTOS, MesaDibujo, estiloPieza, tamanioMesa } from '../salon/dibujo';
+import { ELEMENTOS, MesaDibujo, estiloPieza, estiloPlano, tamanioMesa } from '../salon/dibujo';
 import { sectorElegido } from '../salon/sector-elegido';
 
 const FINO = 50;
@@ -75,6 +75,10 @@ export class Mesas {
     const medidas = this.salon()!.medidas;
     const { ancho, alto } = tamanioMesa(medidas, mesa.vertical, mesa.mesitas);
     return estiloPieza(medidas, mesa.x, mesa.y, ancho, alto);
+  }
+
+  protected estiloPlano() {
+    return estiloPlano(this.salon()!.medidas);
   }
 
   protected estiloElemento(e: { x: number; y: number; ancho: number; alto: number }) {

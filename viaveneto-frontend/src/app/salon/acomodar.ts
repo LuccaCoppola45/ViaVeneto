@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { Api } from '../comun/api';
 import { Avisos } from '../comun/avisos';
 import { Elemento, Medidas, MesaResumen, Salon, Sector, TipoElemento } from '../comun/modelos';
-import { ELEMENTOS, MesaDibujo, TIPOS_ELEMENTO, estiloPieza, tamanioMesa } from './dibujo';
+import { ELEMENTOS, MesaDibujo, TIPOS_ELEMENTO, estiloPieza, estiloPlano, tamanioMesa } from './dibujo';
 import { sectorElegido } from './sector-elegido';
 
 type MesaEnPlano = Pick<MesaResumen, 'id' | 'numero' | 'etiqueta' | 'mesitas' | 'ocupada' | 'x' | 'y' | 'vertical'> & {
@@ -89,8 +89,17 @@ export class AcomodarSalon {
     return estiloPieza(medidas, mesa.x, mesa.y, ancho, alto);
   }
 
+  protected estiloPlano() {
+    return estiloPlano(this.medidas()!);
+  }
+
   protected estiloElemento(e: ElementoEnPlano) {
     return estiloPieza(this.medidas()!, e.x, e.y, e.ancho, e.alto);
+  }
+
+  /** El botón ↻ va pegado a la esquina de arriba a la derecha de lo elegido. */
+  protected estiloGirar(pieza: { left: string; top: string; width: string }) {
+    return { left: `calc(${pieza.left} + ${pieza.width})`, top: pieza.top };
   }
 
   protected esFino(e: Elemento) {

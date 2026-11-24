@@ -19,5 +19,5 @@
 .instruccion { margin: 0 0 10px; font-size: 1.3rem; font-weight: 800; }
 .nota { margin: 8px 0 0; color: var(--suave); font-weight: 600; }
 .acciones-arreglo { display: flex; flex-wrap: wrap; gap: 10px; }
-.plano.modo-arreglo { border-color: #e0b100; width: min(100%, calc((100dvh - 380px) * 1.6)); }
+.plano.modo-arreglo { border-color: #e0b100; width: min(100%, max(520px, calc((100dvh - 380px) * var(--plano-proporcion, 1.25)))); }
 .boton-mesa.elegida { outline: 5px solid #2563eb; outline-offset: 3px; }

@@ -115,8 +115,9 @@ input, select {
 .plano {
   position: relative;
   container-type: inline-size;
-  aspect-ratio: 1000 / 625;
-  width: min(100%, calc((100dvh - 250px) * 1.6));
+  /* La proporción viene del backend (ancho / alto del plano), ver estiloPlano() */
+  aspect-ratio: var(--plano-ratio, 1000 / 800);
+  width: min(100%, max(520px, calc((100dvh - 250px) * var(--plano-proporcion, 1.25))));
   min-width: 300px;
   margin: 0 auto;
   background:
