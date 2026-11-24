@@ -13,6 +13,9 @@ export class Api {
     this.pedir(this.http.post<MesaResumen>('/api/mesas', { numero, sectorId }));
   cambiarNumeroMesa = (id: number, numero: number) =>
     this.pedir(this.http.put<MesaResumen>(`/api/mesas/${id}/numero`, { numero }));
+  pasarMesita = (origenId: number, destinoId: number) =>
+    this.pedir(this.http.post<MesaResumen[]>(`/api/mesas/${origenId}/pasar-mesita`, { destinoId }));
+  partirMesa = (id: number) => this.pedir(this.http.post<MesaResumen[]>(`/api/mesas/${id}/partir`, {}));
   quitarMesa = (id: number) => this.pedir(this.http.delete<void>(`/api/mesas/${id}`));
   abrirMesa = (id: number) => this.pedir(this.http.post<PedidoDetalle>(`/api/mesas/${id}/abrir`, {}));
 

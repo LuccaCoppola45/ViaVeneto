@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SalonService {
 
-	private static final Medidas MEDIDAS = new Medidas(Plano.ANCHO, Plano.ALTO, Plano.MESA_LARGO, Plano.MESA_CORTO);
+	private static final Medidas MEDIDAS = new Medidas(Plano.ANCHO, Plano.ALTO, Plano.MESITA_LARGO, Plano.MESA_CORTO);
 
 	private final SectorRepository sectores;
 	private final ElementoPlanoRepository elementos;

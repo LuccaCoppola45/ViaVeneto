@@ -8,7 +8,7 @@ public record PedidoDetalle(
 		Long id,
 		TipoPedido tipo,
 		EstadoPedido estado,
-		Integer mesaNumero,
+		String mesaEtiqueta,
 		LocalDateTime abiertoEn,
 		LocalDateTime cerradoEn,
 		List<Item> items,
@@ -22,8 +22,8 @@ public record PedidoDetalle(
 				.map(i -> new Item(i.getId(), i.getProducto().getId(), i.getNombre(), i.getPrecioUnitario(),
 						i.getCantidad(), i.subtotal()))
 				.toList();
-		Integer mesaNumero = pedido.getMesa() == null ? null : pedido.getMesa().getNumero();
-		return new PedidoDetalle(pedido.getId(), pedido.getTipo(), pedido.getEstado(), mesaNumero,
+		String mesaEtiqueta = pedido.getMesa() == null ? null : pedido.getMesa().etiqueta();
+		return new PedidoDetalle(pedido.getId(), pedido.getTipo(), pedido.getEstado(), mesaEtiqueta,
 				pedido.getAbiertoEn(), pedido.getCerradoEn(), items, pedido.total());
 	}
 }

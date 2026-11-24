@@ -9,9 +9,15 @@ public final class Plano {
 	public static final int ANCHO = 1000;
 	public static final int ALTO = 625;
 
-	/** Las mesas son de 4 lugares (dos mesitas juntas): rectángulo con sillas en los lados largos. */
-	public static final int MESA_LARGO = 180;
+	/**
+	 * Cada mesa se arma con mesitas individuales de 2 lugares (una silla de cada lado) puestas en fila.
+	 * Lo habitual son 2 mesitas: una mesa de 4.
+	 */
+	public static final int MESITA_LARGO = 90;
 	public static final int MESA_CORTO = 120;
+	public static final int MESITAS_HABITUALES = 2;
+	public static final int MAXIMO_MESITAS = 6;
+	public static final int MESA_LARGO = MESITA_LARGO * MESITAS_HABITUALES;
 
 	private Plano() {
 	}

@@ -27,16 +27,16 @@
       </div>
     }
     @for (mesa of mesasDelSector(); track mesa.id) {
-      <app-mesa-dibujo class="pieza movible" [vertical]="mesa.vertical" [class.ocupada]="mesa.ocupada" [class.elegida]="esMesaElegida(mesa)"
+      <app-mesa-dibujo class="pieza movible" [vertical]="mesa.vertical" [mesitas]="mesa.mesitas" [class.ocupada]="mesa.ocupada" [class.elegida]="esMesaElegida(mesa)"
                        [style]="estiloMesa(mesa)" (pointerdown)="empezarArrastre($event, mesa)">
-        <span class="numero">{{ mesa.numero }}</span>
+        <span class="numero">{{ mesa.etiqueta }}</span>
       </app-mesa-dibujo>
     }
   </div>
 
   <div class="panel tarjeta">
     @if (mesaElegida(); as mesa) {
-      <strong class="titulo-panel">Mesa {{ mesa.numero }}</strong>
+      <strong class="titulo-panel">Mesa {{ mesa.etiqueta }} · {{ mesa.mesitas * 2 }} lugares</strong>
       <div class="botones">
         <button (click)="girarMesa(mesa)">↻ Girar</button>
         <button (click)="cambiarNumero(mesa)">Cambiar número</button>

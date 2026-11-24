@@ -4,12 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Lo que muestra cada mesa en el plano: dónde está y, si está ocupada, cuánto lleva.
- * Si la mesa está libre, los datos del pedido vienen en null.
+ * Lo que muestra cada mesa en el plano: cómo se llama, dónde está, cuántas mesitas tiene
+ * y, si está ocupada, cuánto lleva. Si la mesa está libre, los datos del pedido vienen en null.
  */
 public record MesaResumen(
 		Long id,
 		int numero,
+		String etiqueta,
+		int mesitas,
 		Long sectorId,
 		int x,
 		int y,

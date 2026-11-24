@@ -1,5 +1,7 @@
 package ar.viaveneto.mesa;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import ar.viaveneto.salon.Plano;
 import ar.viaveneto.salon.Sector;
 import jakarta.persistence.Column;
@@ -9,10 +11,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(name = "uk_mesa_numero_sufijo", columnNames = { "numero", "sufijo" }))
 @Getter
 @NoArgsConstructor
 public class Mesa {
@@ -21,8 +26,18 @@ public class Mesa {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	private int numero;
+
+	/** "B", "C"… cuando una mesa se partió en dos (la 4 y la 4B). Vacío en las mesas normales. */
+	@Column(nullable = false, length = 2)
+	@ColumnDefault("''")
+	private String sufijo = "";
+
+	/** Cuántas mesitas individuales de 2 lugares la forman. */
+	@Column(nullable = false)
+	@ColumnDefault("2")
+	private int mesitas = Plano.MESITAS_HABITUALES;
 
 	/** Las mesas que se sacan del salón quedan inactivas para no perder sus pedidos viejos. */
 	@Column(nullable = false)
@@ -40,8 +55,23 @@ public class Mesa {
 	private boolean vertical;
 
 	public Mesa(int numero, Sector sector, int x, int y) {
+		this(numero, "", Plano.MESITAS_HABITUALES, sector, x, y, false);
+	}
+
+	Mesa(int numero, String sufijo, int mesitas, Sector sector, int x, int y, boolean vertical) {
 		this.numero = numero;
-		ubicar(sector, x, y, false);
+		this.sufijo = sufijo;
+		this.mesitas = mesitas;
+		ubicar(sector, x, y, vertical);
+	}
+
+	/** Cómo se la nombra en pantalla: "4" o "4B". */
+	public String etiqueta() {
+		return numero + sufijo;
+	}
+
+	public int lugares() {
+		return mesitas * 2;
 	}
 
 	public void ubicar(Sector sector, int x, int y, boolean vertical) {
@@ -52,11 +82,20 @@ public class Mesa {
 	}
 
 	public int ancho() {
-		return vertical ? Plano.MESA_CORTO : Plano.MESA_LARGO;
+		return vertical ? Plano.MESA_CORTO : largo();
 	}
 
 	public int alto() {
-		return vertical ? Plano.MESA_LARGO : Plano.MESA_CORTO;
+		return vertical ? largo() : Plano.MESA_CORTO;
+	}
+
+	private int largo() {
+		return Plano.MESITA_LARGO * mesitas;
+	}
+
+	void sumarMesitas(int cantidad) {
+		this.mesitas += cantidad;
+		ubicar(sector, x, y, vertical);
 	}
 
 	public void cambiarNumero(int numero) {
@@ -67,7 +106,10 @@ public class Mesa {
 		this.activa = false;
 	}
 
-	public void reactivar() {
+	/** Vuelve al salón como una mesa nueva: con sus mesitas y en el lugar indicado. */
+	void reactivar(int mesitas, Sector sector, int x, int y, boolean vertical) {
 		this.activa = true;
+		this.mesitas = mesitas;
+		ubicar(sector, x, y, vertical);
 	}
 }

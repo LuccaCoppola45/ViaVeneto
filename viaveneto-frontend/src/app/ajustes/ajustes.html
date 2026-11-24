@@ -50,8 +50,8 @@
   <div class="mesas">
     @for (mesa of mesas(); track mesa.id) {
       <div class="mesa-chip">
-        <span>Mesa {{ mesa.numero }}</span>
-        <button [disabled]="mesa.ocupada || guardando()" (click)="quitarMesa(mesa)" [attr.aria-label]="'Quitar mesa ' + mesa.numero">
+        <span>Mesa {{ mesa.etiqueta }}</span>
+        <button [disabled]="mesa.ocupada || guardando()" (click)="quitarMesa(mesa)" [attr.aria-label]="'Quitar mesa ' + mesa.etiqueta">
           Quitar
         </button>
       </div>

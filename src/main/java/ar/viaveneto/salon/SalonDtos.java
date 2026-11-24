@@ -22,7 +22,7 @@ public final class SalonDtos {
 	}
 
 	/** Medidas que usa el frontend para dibujar, así no quedan repetidas en los dos lados. */
-	public record Medidas(int ancho, int alto, int mesaLargo, int mesaCorto) {
+	public record Medidas(int ancho, int alto, int mesitaLargo, int mesaCorto) {
 	}
 
 	public record SalonVista(Medidas medidas, List<SectorVista> sectores) {
@@ -35,7 +35,7 @@ public final class SalonDtos {
 	}
 
 	/** Todo lo acomodado de una vez: las mesas que se movieron y todos los elementos del local. */
-	public record PlanoForm(@Valid @NotNull List<UbicacionMesa> mesas, @Valid @NotNull List<ElementoForm> elementos) {
+	public record PlanoForm(@NotNull List<@Valid UbicacionMesa> mesas, @NotNull List<@Valid ElementoForm> elementos) {
 	}
 
 	public record SectorForm(

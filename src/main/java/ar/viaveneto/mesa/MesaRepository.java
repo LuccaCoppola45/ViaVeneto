@@ -11,11 +11,13 @@ import jakarta.persistence.LockModeType;
 
 public interface MesaRepository extends JpaRepository<Mesa, Long> {
 
-	List<Mesa> findByActivaTrueOrderByNumero();
+	List<Mesa> findByActivaTrueOrderByNumeroAscSufijoAsc();
 
-	Optional<Mesa> findByNumero(int numero);
+	Optional<Mesa> findByNumeroAndSufijo(int numero, String sufijo);
 
-	/** Bloquea la fila para que dos tablets no abran la misma mesa a la vez. */
+	List<Mesa> findByNumero(int numero);
+
+	/** Bloquea la fila para que dos tablets no cambien la misma mesa a la vez. */
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	@Query("select m from Mesa m where m.id = :id")
 	Optional<Mesa> findByIdParaActualizar(Long id);

@@ -11,8 +11,47 @@
     }
   </div>
 
+  @if (arreglo(); as paso) {
+    <div class="arreglando" role="status">
+      @switch (paso.paso) {
+        @case ('elegir') {
+          <p class="instruccion">Tocá la mesa que querés cambiar.</p>
+          <div class="acciones-arreglo">
+            <button class="primario" (click)="terminarArreglo()">Listo, terminé</button>
+          </div>
+        }
+        @case ('opciones') {
+          @if (mesaArreglada(); as mesa) {
+            <p class="instruccion">
+              Mesa {{ mesa.etiqueta }}: {{ mesa.mesitas }} {{ mesa.mesitas === 1 ? 'mesita' : 'mesitas' }} ({{ mesa.mesitas * 2 }} personas)
+            </p>
+            <div class="acciones-arreglo">
+              <button class="primario" [disabled]="trabajando() || !puedeDarMesita(mesa)" (click)="elegirDestino(mesa)">
+                Pasar una mesita a otra mesa
+              </button>
+              <button class="primario" [disabled]="trabajando() || mesa.mesitas < 2" (click)="partir(mesa)">
+                Partir en dos ({{ mesa.etiqueta }} y otra)
+              </button>
+              <button (click)="empezarArreglo()">Elegir otra mesa</button>
+            </div>
+            @if (!puedeDarMesita(mesa)) {
+              <p class="nota">Está ocupada y tiene una sola mesita: no se le puede sacar.</p>
+            }
+          }
+        }
+        @case ('destino') {
+          <p class="instruccion">Tocá la mesa que recibe la mesita de la {{ mesaArreglada()?.etiqueta }}.</p>
+          <p class="nota">Si está en otro sector, cambiá de pestaña arriba.</p>
+          <div class="acciones-arreglo">
+            <button (click)="empezarArreglo()">Cancelar</button>
+          </div>
+        }
+      }
+    </div>
+  }
+
   @if (sectorActual(); as sector) {
-    <div class="plano" [attr.aria-label]="'Plano de ' + sector.nombre">
+    <div class="plano" [class.modo-arreglo]="arreglo()" [attr.aria-label]="'Plano de ' + sector.nombre">
       @for (elemento of sector.elementos; track $index) {
         <div class="pieza elemento" [class]="elemento.tipo" [class.fino]="esFino(elemento)" [class.parado]="elemento.alto > elemento.ancho" [style]="estiloElemento(elemento)" aria-hidden="true">
           @if (ELEMENTOS[elemento.tipo].icono) { <span class="icono">{{ ELEMENTOS[elemento.tipo].icono }}</span> }
@@ -20,13 +59,16 @@
         </div>
       }
       @for (mesa of mesasDelSector(); track mesa.id) {
-        <button class="pieza boton-mesa" [style]="estiloMesa(mesa)" [disabled]="abriendo() === mesa.id" (click)="entrar(mesa)"
-                [attr.aria-label]="'Mesa ' + mesa.numero + (mesa.ocupada ? ', ocupada' : ', libre')">
-          <app-mesa-dibujo [vertical]="mesa.vertical" [class.ocupada]="mesa.ocupada">
-            <span class="numero">{{ mesa.numero }}</span>
+        <button class="pieza boton-mesa" [style]="estiloMesa(mesa)" [disabled]="abriendo() === mesa.id || trabajando()"
+                [class.elegida]="mesaArreglada()?.id === mesa.id" (click)="tocarMesa(mesa)"
+                [attr.aria-label]="'Mesa ' + mesa.etiqueta + (mesa.ocupada ? ', ocupada' : ', libre')">
+          <app-mesa-dibujo [vertical]="mesa.vertical" [mesitas]="mesa.mesitas" [class.ocupada]="mesa.ocupada">
+            <span class="numero">{{ mesa.etiqueta }}</span>
             @if (mesa.ocupada) {
               <span class="total">{{ mesa.total | plata }}</span>
               <span class="detalle">{{ hace(mesa) }}</span>
+            } @else if (arreglo()) {
+              <span class="detalle">{{ mesa.mesitas * 2 }} personas</span>
             }
           </app-mesa-dibujo>
         </button>
@@ -36,9 +78,14 @@
     </div>
   }
 
-  <p class="ayuda">
-    <span class="muestra libre"></span> Libre
-    <span class="muestra ocupada"></span> Ocupada
-    <span class="separador">·</span> Tocá una mesa para cargar el pedido
-  </p>
+  @if (!arreglo()) {
+    <div class="pie">
+      <p class="ayuda">
+        <span class="muestra libre"></span> Libre
+        <span class="muestra ocupada"></span> Ocupada
+        <span class="separador">·</span> Tocá una mesa para cargar el pedido
+      </p>
+      <button class="boton-arreglo" (click)="empezarArreglo()">🪑 Juntar o separar mesas</button>
+    </div>
+  }
 }

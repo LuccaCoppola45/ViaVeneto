@@ -42,6 +42,17 @@ public class MesaController {
 		return mesaService.cambiarNumero(id, nuevo);
 	}
 
+	/** Devuelve todas las mesas: cambian dos a la vez. */
+	@PostMapping("/{id}/pasar-mesita")
+	public List<MesaResumen> pasarMesita(@PathVariable Long id, @Valid @RequestBody PasarMesita pase) {
+		return mesaService.pasarMesita(id, pase);
+	}
+
+	@PostMapping("/{id}/partir")
+	public List<MesaResumen> partir(@PathVariable Long id) {
+		return mesaService.partir(id);
+	}
+
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void quitar(@PathVariable Long id) {

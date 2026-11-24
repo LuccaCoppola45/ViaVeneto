@@ -6,7 +6,9 @@ import { Elemento, Medidas, MesaResumen, Salon, Sector, TipoElemento } from '../
 import { ELEMENTOS, MesaDibujo, TIPOS_ELEMENTO, estiloPieza, tamanioMesa } from './dibujo';
 import { sectorElegido } from './sector-elegido';
 
-type MesaEnPlano = Pick<MesaResumen, 'id' | 'numero' | 'ocupada' | 'x' | 'y' | 'vertical'> & { sectorId: number };
+type MesaEnPlano = Pick<MesaResumen, 'id' | 'numero' | 'etiqueta' | 'mesitas' | 'ocupada' | 'x' | 'y' | 'vertical'> & {
+  sectorId: number;
+};
 type ElementoEnPlano = Elemento & { clave: number; sectorId: number };
 type Seleccion = { tipo: 'mesa'; id: number } | { tipo: 'elemento'; clave: number } | null;
 
@@ -83,7 +85,7 @@ export class AcomodarSalon {
 
   protected estiloMesa(mesa: MesaEnPlano) {
     const medidas = this.medidas()!;
-    const { ancho, alto } = tamanioMesa(medidas, mesa.vertical);
+    const { ancho, alto } = tamanioMesa(medidas, mesa.vertical, mesa.mesitas);
     return estiloPieza(medidas, mesa.x, mesa.y, ancho, alto);
   }
 
@@ -166,7 +168,7 @@ export class AcomodarSalon {
   protected girarMesa(mesa: MesaEnPlano) {
     const medidas = this.medidas()!;
     const vertical = !mesa.vertical;
-    const { ancho, alto } = tamanioMesa(medidas, vertical);
+    const { ancho, alto } = tamanioMesa(medidas, vertical, mesa.mesitas);
     this.actualizarMesa(mesa.id, {
       vertical,
       x: limitar(mesa.x, 0, medidas.ancho - ancho),
@@ -189,7 +191,7 @@ export class AcomodarSalon {
   protected moverMesaA(mesa: MesaEnPlano, sector: Sector) {
     this.actualizarMesa(mesa.id, { sectorId: sector.id });
     this.seleccion.set(null);
-    this.avisos.ok(`La mesa ${mesa.numero} pasó a ${sector.nombre}. Acordate de guardar.`);
+    this.avisos.ok(`La mesa ${mesa.etiqueta} pasó a ${sector.nombre}. Acordate de guardar.`);
   }
 
   protected borrarElemento(e: ElementoEnPlano) {
@@ -199,13 +201,15 @@ export class AcomodarSalon {
   }
 
   protected async cambiarNumero(mesa: MesaEnPlano) {
-    const texto = prompt(`Nuevo número para la mesa ${mesa.numero}:`, String(mesa.numero));
+    const texto = prompt(`Nuevo número para la mesa ${mesa.etiqueta}:`, String(mesa.numero));
     const numero = Number(texto);
     if (!texto || !Number.isInteger(numero) || numero < 1 || numero === mesa.numero) return;
     try {
-      await this.api.cambiarNumeroMesa(mesa.id, numero);
-      this.mesas.update((lista) => lista.map((m) => (m.id === mesa.id ? { ...m, numero } : m)));
-      this.avisos.ok(`Ahora es la mesa ${numero}`);
+      const cambiada = await this.api.cambiarNumeroMesa(mesa.id, numero);
+      this.mesas.update((lista) =>
+        lista.map((m) => (m.id === mesa.id ? { ...m, numero, etiqueta: cambiada.etiqueta } : m)),
+      );
+      this.avisos.ok(`Ahora es la mesa ${cambiada.etiqueta}`);
     } catch (error) {
       this.avisos.error((error as Error).message);
     }
@@ -305,7 +309,7 @@ export class AcomodarSalon {
   }
 
   private tamanio(pieza: MesaEnPlano | ElementoEnPlano) {
-    return 'clave' in pieza ? { ancho: pieza.ancho, alto: pieza.alto } : tamanioMesa(this.medidas()!, pieza.vertical);
+    return 'clave' in pieza ? { ancho: pieza.ancho, alto: pieza.alto } : tamanioMesa(this.medidas()!, pieza.vertical, pieza.mesitas);
   }
 
   private actualizarMesa(id: number, cambio: Partial<MesaEnPlano>) {

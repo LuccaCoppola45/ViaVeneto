@@ -29,8 +29,8 @@ export class PedidoPagina implements OnInit {
   protected readonly cerrando = signal(false);
 
   protected readonly titulo = computed(() => {
-    const numero = this.pedido()?.mesaNumero;
-    return numero ? `Mesa ${numero}` : 'Pedido';
+    const etiqueta = this.pedido()?.mesaEtiqueta;
+    return etiqueta ? `Mesa ${etiqueta}` : 'Pedido';
   });
   protected readonly abierto = computed(() => this.pedido()?.estado === 'ABIERTO');
   protected readonly unidades = computed(() => this.pedido()?.items.reduce((suma, i) => suma + i.cantidad, 0) ?? 0);

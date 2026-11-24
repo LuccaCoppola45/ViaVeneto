@@ -155,20 +155,27 @@ input, select {
 .elemento.fino .icono { display: none; }
 .elemento.fino.parado .nombre { writing-mode: vertical-rl; }
 
-.mesa-dibujo { position: absolute; display: block; }
-.mesa-dibujo .silla { position: absolute; width: 26%; height: 15%; border-radius: 40%; background: #8a6440; }
-.mesa-dibujo .s1 { top: 0; left: 14%; } .mesa-dibujo .s2 { top: 0; right: 14%; }
-.mesa-dibujo .s3 { bottom: 0; left: 14%; } .mesa-dibujo .s4 { bottom: 0; right: 14%; }
-.mesa-dibujo.vertical .silla { width: 15%; height: 26%; }
-.mesa-dibujo.vertical .s1 { top: 14%; left: 0; } .mesa-dibujo.vertical .s2 { top: auto; bottom: 14%; left: 0; right: auto; }
-.mesa-dibujo.vertical .s3 { top: 14%; bottom: auto; right: 0; left: auto; } .mesa-dibujo.vertical .s4 { bottom: 14%; right: 0; left: auto; }
+.mesa-dibujo { position: absolute; display: block; --mesitas: 2; }
+.mesa-dibujo .fila { position: absolute; left: 0; right: 0; height: 15%; display: flex; justify-content: space-around; }
+.mesa-dibujo .lado-a { top: 0; } .mesa-dibujo .lado-b { bottom: 0; }
+.mesa-dibujo .silla { width: calc(55% / var(--mesitas)); height: 100%; border-radius: 40%; background: #8a6440; }
+.mesa-dibujo.vertical .fila { top: 0; bottom: 0; left: auto; right: auto; width: 15%; height: auto; flex-direction: column; }
+.mesa-dibujo.vertical .lado-a { left: 0; } .mesa-dibujo.vertical .lado-b { right: 0; }
+.mesa-dibujo.vertical .silla { width: 100%; height: calc(55% / var(--mesitas)); }
 .mesa-dibujo .tablero {
   position: absolute; inset: 11% 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  border-radius: 8px; border: 3px solid var(--libre); background: var(--libre-fondo); color: var(--libre);
+  border-radius: 8px; border: 3px solid var(--libre); color: var(--libre);
+  /* una línea por cada junta entre mesitas */
+  background: linear-gradient(90deg, transparent calc(100% - 2px), rgba(31, 122, 61, 0.35) 0) 0 0 / calc(100% / var(--mesitas)) 100% repeat-x, var(--libre-fondo);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); line-height: 1.05; overflow: hidden;
 }
-.mesa-dibujo.vertical .tablero { inset: 0 11%; }
-.mesa-dibujo.ocupada .tablero { border-color: var(--ocupada); background: var(--ocupada-fondo); color: var(--ocupada); }
+.mesa-dibujo.vertical .tablero {
+  inset: 0 11%;
+  background: linear-gradient(180deg, transparent calc(100% - 2px), rgba(31, 122, 61, 0.35) 0) 0 0 / 100% calc(100% / var(--mesitas)) repeat-y, var(--libre-fondo);
+}
+.mesa-dibujo.ocupada .tablero { border-color: var(--ocupada); color: var(--ocupada); background-color: var(--ocupada-fondo); }
+.mesa-dibujo.ocupada .tablero { background-image: linear-gradient(90deg, transparent calc(100% - 2px), rgba(179, 84, 30, 0.35) 0); }
+.mesa-dibujo.ocupada.vertical .tablero { background-image: linear-gradient(180deg, transparent calc(100% - 2px), rgba(179, 84, 30, 0.35) 0); }
 .mesa-dibujo.ocupada .silla { background: var(--ocupada); }
 .mesa-dibujo .numero { font-size: clamp(16px, 4.2cqw, 46px); font-weight: 800; }
 .mesa-dibujo .total { font-size: clamp(10px, 1.8cqw, 20px); font-weight: 800; color: var(--texto); font-variant-numeric: tabular-nums; }

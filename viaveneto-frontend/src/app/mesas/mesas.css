@@ -3,8 +3,21 @@
 .boton-mesa app-mesa-dibujo { inset: 0; }
 .sin-mesas { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: var(--suave); font-weight: 600; }
 
-.ayuda { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px; margin: 14px 0 0; color: var(--suave); font-weight: 600; }
+.pie { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 24px; margin-top: 14px; }
+.ayuda { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px; margin: 0; color: var(--suave); font-weight: 600; }
 .muestra { display: inline-block; width: 22px; height: 16px; border-radius: 4px; border: 3px solid; vertical-align: middle; }
 .muestra.libre { background: var(--libre-fondo); border-color: var(--libre); }
 .muestra.ocupada { background: var(--ocupada-fondo); border-color: var(--ocupada); margin-left: 8px; }
 .separador { margin: 0 4px; }
+
+.boton-arreglo { min-height: 56px; }
+
+.arreglando {
+  margin-bottom: 12px; padding: 14px 16px; border-radius: var(--radio);
+  background: #fff6d6; border: 3px solid #e0b100;
+}
+.instruccion { margin: 0 0 10px; font-size: 1.3rem; font-weight: 800; }
+.nota { margin: 8px 0 0; color: var(--suave); font-weight: 600; }
+.acciones-arreglo { display: flex; flex-wrap: wrap; gap: 10px; }
+.plano.modo-arreglo { border-color: #e0b100; width: min(100%, calc((100dvh - 380px) * 1.6)); }
+.boton-mesa.elegida { outline: 5px solid #2563eb; outline-offset: 3px; }

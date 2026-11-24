@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { Medidas, TipoElemento } from '../comun/modelos';
 
 type ComoSeVe = { nombre: string; icono: string; ancho: number; alto: number };
@@ -26,21 +26,27 @@ export const estiloPieza = (medidas: Medidas, x: number, y: number, ancho: numbe
   height: `${(alto / medidas.alto) * 100}%`,
 });
 
-export const tamanioMesa = (medidas: Medidas, vertical: boolean) =>
-  vertical
-    ? { ancho: medidas.mesaCorto, alto: medidas.mesaLargo }
-    : { ancho: medidas.mesaLargo, alto: medidas.mesaCorto };
+/** Las mesitas van en fila: cuantas más tiene la mesa, más larga es. */
+export const tamanioMesa = (medidas: Medidas, vertical: boolean, mesitas: number) => {
+  const largo = medidas.mesitaLargo * mesitas;
+  return vertical ? { ancho: medidas.mesaCorto, alto: largo } : { ancho: largo, alto: medidas.mesaCorto };
+};
 
-/** Mesa de 4 lugares vista desde arriba: el tablero con dos sillas de cada lado largo. */
+/**
+ * Mesa vista desde arriba: las mesitas individuales en fila (se ven las juntas)
+ * con una silla de cada lado por mesita.
+ */
 @Component({
   selector: 'app-mesa-dibujo',
-  host: { class: 'mesa-dibujo', '[class.vertical]': 'vertical()' },
+  host: { class: 'mesa-dibujo', '[class.vertical]': 'vertical()', '[style.--mesitas]': 'mesitas()' },
   template: `
-    <span class="silla s1"></span><span class="silla s2"></span>
-    <span class="silla s3"></span><span class="silla s4"></span>
+    <span class="fila lado-a">@for (silla of sillas(); track silla) { <span class="silla"></span> }</span>
     <span class="tablero"><ng-content /></span>
+    <span class="fila lado-b">@for (silla of sillas(); track silla) { <span class="silla"></span> }</span>
   `,
 })
 export class MesaDibujo {
   readonly vertical = input(false);
+  readonly mesitas = input(2);
+  protected readonly sillas = computed(() => Array.from({ length: this.mesitas() }, (_, i) => i));
 }

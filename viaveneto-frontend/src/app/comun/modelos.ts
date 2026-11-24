@@ -1,6 +1,10 @@
 export type MesaResumen = {
   id: number;
   numero: number;
+  /** "4" o "4B" si la mesa se partió. */
+  etiqueta: string;
+  /** Mesitas individuales de 2 lugares que la forman. */
+  mesitas: number;
   sectorId: number | null;
   x: number;
   y: number;
@@ -27,7 +31,7 @@ export type PedidoDetalle = {
   id: number;
   tipo: 'MESA' | 'PARA_LLEVAR' | 'DELIVERY';
   estado: EstadoPedido;
-  mesaNumero: number | null;
+  mesaEtiqueta: string | null;
   abiertoEn: string;
   cerradoEn: string | null;
   items: ItemPedido[];
@@ -59,7 +63,7 @@ export type Elemento = { tipo: TipoElemento; x: number; y: number; ancho: number
 export type Sector = { id: number; nombre: string; orden: number; elementos: Elemento[] };
 
 /** Tamaño del plano y de las mesas, en las unidades del backend. */
-export type Medidas = { ancho: number; alto: number; mesaLargo: number; mesaCorto: number };
+export type Medidas = { ancho: number; alto: number; mesitaLargo: number; mesaCorto: number };
 
 export type Salon = { medidas: Medidas; sectores: Sector[] };
 

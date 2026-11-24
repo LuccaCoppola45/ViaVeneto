@@ -85,10 +85,10 @@ export class Ajustes {
   }
 
   protected async quitarMesa(mesa: MesaResumen) {
-    if (!confirm(`¿Quitar la mesa ${mesa.numero} del salón?`)) return;
+    if (!confirm(`¿Quitar la mesa ${mesa.etiqueta} del salón?`)) return;
     await this.hacer(async () => {
       await this.api.quitarMesa(mesa.id);
-      this.avisos.ok(`Mesa ${mesa.numero} quitada`);
+      this.avisos.ok(`Mesa ${mesa.etiqueta} quitada`);
       this.mesas.set(await this.api.mesas());
     });
   }

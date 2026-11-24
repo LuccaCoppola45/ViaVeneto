@@ -10,6 +10,16 @@ import { sectorElegido } from '../salon/sector-elegido';
 
 const FINO = 50;
 
+/**
+ * Juntar o separar mesitas, paso a paso:
+ * primero se toca la mesa a cambiar, después se elige qué hacer
+ * y, si es pasar una mesita, se toca la mesa que la recibe.
+ */
+type Arreglo =
+  | { paso: 'elegir' }
+  | { paso: 'opciones'; mesaId: number }
+  | { paso: 'destino'; mesaId: number };
+
 @Component({
   selector: 'app-mesas',
   imports: [PlataPipe, MesaDibujo],
@@ -25,6 +35,8 @@ export class Mesas {
   protected readonly salon = signal<Salon | null>(null);
   protected readonly mesas = signal<MesaResumen[]>([]);
   protected readonly abriendo = signal<number | null>(null);
+  protected readonly arreglo = signal<Arreglo | null>(null);
+  protected readonly trabajando = signal(false);
   private readonly ahora = signal(Date.now());
 
   protected readonly ELEMENTOS = ELEMENTOS;
@@ -41,7 +53,10 @@ export class Mesas {
     this.mesas().filter((m) => this.sectorDeMesa(m) === this.sectorActual()?.id),
   );
 
-  protected readonly libresTotal = computed(() => this.mesas().filter((m) => !m.ocupada).length);
+  protected readonly mesaArreglada = computed(() => {
+    const arreglo = this.arreglo();
+    return arreglo && arreglo.paso !== 'elegir' ? this.mesas().find((m) => m.id === arreglo.mesaId) : undefined;
+  });
 
   constructor() {
     this.cargarTodo();
@@ -58,7 +73,7 @@ export class Mesas {
 
   protected estiloMesa(mesa: MesaResumen) {
     const medidas = this.salon()!.medidas;
-    const { ancho, alto } = tamanioMesa(medidas, mesa.vertical);
+    const { ancho, alto } = tamanioMesa(medidas, mesa.vertical, mesa.mesitas);
     return estiloPieza(medidas, mesa.x, mesa.y, ancho, alto);
   }
 
@@ -74,8 +89,74 @@ export class Mesas {
     return mesa.abiertaDesde ? tiempoDesde(mesa.abiertaDesde, this.ahora()) : '';
   }
 
+  protected tocarMesa(mesa: MesaResumen) {
+    const arreglo = this.arreglo();
+    if (!arreglo) {
+      this.entrar(mesa);
+    } else if (arreglo.paso === 'destino') {
+      this.pasarMesita(arreglo.mesaId, mesa);
+    } else {
+      this.arreglo.set({ paso: 'opciones', mesaId: mesa.id });
+    }
+  }
+
+  protected empezarArreglo() {
+    this.arreglo.set({ paso: 'elegir' });
+  }
+
+  protected terminarArreglo() {
+    this.arreglo.set(null);
+  }
+
+  protected elegirDestino(mesa: MesaResumen) {
+    this.arreglo.set({ paso: 'destino', mesaId: mesa.id });
+  }
+
+  /** Se puede sacar una mesita si le queda otra, o si la mesa está libre (y desaparece). */
+  protected puedeDarMesita(mesa: MesaResumen) {
+    return mesa.mesitas > 1 || !mesa.ocupada;
+  }
+
+  protected async partir(mesa: MesaResumen) {
+    await this.arreglar(async () => {
+      this.mesas.set(await this.api.partirMesa(mesa.id));
+      const nueva = this.mesas().find((m) => m.numero === mesa.numero && m.id !== mesa.id && m.etiqueta !== mesa.etiqueta);
+      this.avisos.ok(nueva ? `Listo: ahora están la ${mesa.etiqueta} y la ${nueva.etiqueta}` : 'Mesa partida');
+    });
+  }
+
+  private async pasarMesita(origenId: number, destino: MesaResumen) {
+    if (origenId === destino.id) {
+      this.avisos.error('Tocá otra mesa: la que recibe la mesita.');
+      return;
+    }
+    const origen = this.mesas().find((m) => m.id === origenId);
+    await this.arreglar(async () => {
+      this.mesas.set(await this.api.pasarMesita(origenId, destino.id));
+      const lugares = (destino.mesitas + 1) * 2;
+      const seJunto = origen && origen.mesitas === 1;
+      this.avisos.ok(
+        seJunto
+          ? `La ${origen.etiqueta} se juntó con la ${destino.etiqueta}: ahora es para ${lugares}`
+          : `La ${destino.etiqueta} ahora es para ${lugares} personas`,
+      );
+    });
+  }
+
+  private async arreglar(accion: () => Promise<void>) {
+    this.trabajando.set(true);
+    try {
+      await accion();
+      this.arreglo.set({ paso: 'elegir' });
+    } catch (error) {
+      this.avisos.error((error as Error).message);
+    } finally {
+      this.trabajando.set(false);
+    }
+  }
+
   /** Mesa libre: la abre. Mesa ocupada: muestra su pedido. */
-  protected async entrar(mesa: MesaResumen) {
+  private async entrar(mesa: MesaResumen) {
     if (mesa.pedidoId) {
       this.router.navigate(['/pedidos', mesa.pedidoId]);
       return;
