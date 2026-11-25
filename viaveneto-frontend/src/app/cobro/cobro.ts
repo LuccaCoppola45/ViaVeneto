@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { Api } from '../comun/api';
 import { Avisos } from '../comun/avisos';
 import { PlataPipe } from '../comun/formato';
-import { DESCUENTO_EFECTIVO, MEDIOS, nombreMedio } from '../comun/medios';
+import { DESCUENTO_EFECTIVO, MEDIOS, MEDIOS_LOCAL, nombreMedio } from '../comun/medios';
 import { ItemPedido, MedioPago, PedidoDetalle } from '../comun/modelos';
 import { abrirTicket } from '../ticket/abrir-ticket';
 
@@ -24,7 +24,6 @@ export class Cobro implements OnInit {
   private readonly api = inject(Api);
   private readonly avisos = inject(Avisos);
 
-  protected readonly MEDIOS = MEDIOS;
   protected readonly DESCUENTO_EFECTIVO = DESCUENTO_EFECTIVO;
   protected readonly nombreMedio = nombreMedio;
 
@@ -39,10 +38,11 @@ export class Cobro implements OnInit {
   protected readonly propina = signal<number | null>(null);
   protected readonly trabajando = signal(false);
 
-  protected readonly titulo = computed(() => {
-    const etiqueta = this.pedido()?.mesaEtiqueta;
-    return etiqueta ? `Mesa ${etiqueta}` : 'Pedido';
-  });
+  protected readonly titulo = computed(() => this.pedido()?.titulo ?? 'Pedido');
+  /** Los de Rappi se cobran con Rappi; en el local, con los medios de siempre. */
+  protected readonly medios = computed(() =>
+    this.pedido()?.tipo === 'DELIVERY' ? MEDIOS.filter((m) => m.medio === 'RAPPI') : MEDIOS_LOCAL,
+  );
   protected readonly saldo = computed(() => this.pedido()?.saldo ?? 0);
   protected readonly cobrada = computed(() => this.pedido()?.estado === 'CERRADO');
   protected readonly conDescuento = computed(() => (this.pedido()?.descuentoPorcentaje ?? 0) > 0);
@@ -69,6 +69,7 @@ export class Cobro implements OnInit {
     try {
       this.actualizar(await this.api.pedido(this.id()));
       this.elegirForma('todo');
+      if (this.pedido()?.tipo === 'DELIVERY') this.medio.set('RAPPI');
     } catch (error) {
       this.avisos.error((error as Error).message);
     }
@@ -102,6 +103,11 @@ export class Cobro implements OnInit {
   }
 
   // ---------- Con qué paga ----------
+
+  /** "con débito", "con efectivo", pero "con Rappi" (es un nombre propio). */
+  protected medioEnTexto(medio: MedioPago) {
+    return medio === 'RAPPI' ? 'Rappi' : nombreMedio(medio).toLowerCase();
+  }
 
   protected elegirMedio(medio: MedioPago) {
     this.medio.set(medio);
@@ -143,7 +149,7 @@ export class Cobro implements OnInit {
       this.actualizar(actualizado);
       const vuelto = this.vuelto();
       this.avisos.ok(
-        vuelto ? `Cobrado. Vuelto: $ ${vuelto.toLocaleString('es-AR')}` : `Cobrado con ${nombreMedio(medio).toLowerCase()}`,
+        vuelto ? `Cobrado. Vuelto: $ ${vuelto.toLocaleString('es-AR')}` : `Cobrado con ${this.medioEnTexto(medio)}`,
       );
       this.prepararSiguientePago();
     });
@@ -162,7 +168,7 @@ export class Cobro implements OnInit {
   }
 
   private prepararSiguientePago() {
-    this.medio.set(null);
+    this.medio.set(this.pedido()?.tipo === 'DELIVERY' ? 'RAPPI' : null);
     this.recibido.set(null);
     this.propina.set(null);
     if (this.forma() === 'partes') {

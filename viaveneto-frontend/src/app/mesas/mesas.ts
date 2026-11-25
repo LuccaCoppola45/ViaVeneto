@@ -7,8 +7,19 @@ import { MesaResumen, Salon, Sector } from '../comun/modelos';
 import { refrescarCadaRato } from '../comun/refresco';
 import { ELEMENTOS, MesaDibujo, estiloPieza, estiloPlano, tamanioMesa } from '../salon/dibujo';
 import { sectorElegido } from '../salon/sector-elegido';
+import { Sesion } from '../comun/sesion';
+import { SinMesa } from './sin-mesa';
 
 const FINO = 50;
+const CLAVE_MIS_MESAS = 'viaveneto.misMesas';
+
+const leerMisMesas = () => {
+  try {
+    return localStorage.getItem(CLAVE_MIS_MESAS) === '1';
+  } catch {
+    return false;
+  }
+};
 
 /**
  * Juntar o separar mesitas, paso a paso:
@@ -22,7 +33,7 @@ type Arreglo =
 
 @Component({
   selector: 'app-mesas',
-  imports: [PlataPipe, MesaDibujo],
+  imports: [PlataPipe, MesaDibujo, SinMesa],
   styleUrl: './mesas.css',
   templateUrl: './mesas.html',
 })
@@ -31,6 +42,10 @@ export class Mesas {
   private readonly avisos = inject(Avisos);
   private readonly router = inject(Router);
   private readonly sector = sectorElegido();
+  private readonly sesion = inject(Sesion);
+
+  /** Resalta las mesas de quien está usando la tablet, como su mitad de la libreta. */
+  protected readonly misMesas = signal(leerMisMesas());
 
   protected readonly salon = signal<Salon | null>(null);
   protected readonly mesas = signal<MesaResumen[]>([]);
@@ -61,6 +76,23 @@ export class Mesas {
   constructor() {
     this.cargarTodo();
     refrescarCadaRato(() => this.cargarMesas());
+  }
+
+  protected cambiarMisMesas() {
+    this.misMesas.update((v) => !v);
+    try {
+      localStorage.setItem(CLAVE_MIS_MESAS, this.misMesas() ? '1' : '0');
+    } catch {
+      // Sin almacenamiento: se recuerda solo mientras esté abierta la pantalla.
+    }
+  }
+
+  protected esMia(mesa: MesaResumen) {
+    return mesa.ocupada && mesa.atiendeId === this.sesion.usuario()?.id;
+  }
+
+  protected esAjena(mesa: MesaResumen) {
+    return this.misMesas() && mesa.ocupada && !this.esMia(mesa);
   }
 
   protected elegirSector(sector: Sector) {

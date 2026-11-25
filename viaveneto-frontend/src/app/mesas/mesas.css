@@ -21,3 +21,13 @@
 .acciones-arreglo { display: flex; flex-wrap: wrap; gap: 10px; }
 .plano.modo-arreglo { border-color: #e0b100; width: min(100%, max(520px, calc((100dvh - 380px) * var(--plano-proporcion, 1.25)))); }
 .boton-mesa.elegida { outline: 5px solid #2563eb; outline-offset: 3px; }
+
+.disposicion { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+.principal { min-width: 0; }
+.lateral { position: sticky; top: 84px; }
+.boton-mesa.mia { outline: 5px solid var(--vino); outline-offset: 3px; }
+.boton-mesa.ajena { opacity: 0.35; }
+@media (max-width: 1000px) {
+  .disposicion { grid-template-columns: minmax(0, 1fr); }
+  .lateral { position: static; }
+}

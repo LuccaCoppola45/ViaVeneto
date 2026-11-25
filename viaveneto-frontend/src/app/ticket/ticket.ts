@@ -21,7 +21,8 @@ import { PedidoDetalle } from '../comun/modelos';
         <div class="centro marca">VIA VENETO</div>
         <div class="centro">{{ esPrecuenta() ? 'PRECUENTA' : 'TICKET' }}</div>
         <div class="corte"></div>
-        <div class="linea"><span class="grande">{{ p.mesaEtiqueta ? 'Mesa ' + p.mesaEtiqueta : 'Pedido ' + p.id }}</span><span>#{{ p.id }}</span></div>
+        <div class="linea"><span class="grande">{{ p.titulo }}</span><span>#{{ p.id }}</span></div>
+        @if (p.atiendeNombre) { <div>Atendió: {{ p.atiendeNombre }}</div> }
         <div>{{ (p.cerradoEn ?? ahora) | date: 'dd/MM/yyyy HH:mm' }}</div>
         <div class="corte"></div>
         @for (item of p.items; track item.id) {

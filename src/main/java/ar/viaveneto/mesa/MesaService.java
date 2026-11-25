@@ -186,10 +186,12 @@ public class MesaService {
 		Long sectorId = mesa.getSector() == null ? null : mesa.getSector().getId();
 		if (abierto == null) {
 			return new MesaResumen(mesa.getId(), mesa.getNumero(), mesa.etiqueta(), mesa.getMesitas(), sectorId,
-					mesa.getX(), mesa.getY(), mesa.isVertical(), false, null, null, 0, BigDecimal.ZERO);
+					mesa.getX(), mesa.getY(), mesa.isVertical(), false, null, null, null, null, 0, BigDecimal.ZERO);
 		}
 		return new MesaResumen(mesa.getId(), mesa.getNumero(), mesa.etiqueta(), mesa.getMesitas(), sectorId,
-				mesa.getX(), mesa.getY(), mesa.isVertical(), true, abierto.getId(), abierto.getAbiertoEn(),
+				mesa.getX(), mesa.getY(), mesa.isVertical(), true, abierto.getId(),
+				abierto.getAtiende() == null ? null : abierto.getAtiende().getId(),
+				abierto.getAtiende() == null ? null : abierto.getAtiende().getNombre(), abierto.getAbiertoEn(),
 				abierto.cantidadDeUnidades(), abierto.total());
 	}
 }

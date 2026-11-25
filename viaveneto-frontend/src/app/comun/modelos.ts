@@ -11,6 +11,9 @@ export type MesaResumen = {
   vertical: boolean;
   ocupada: boolean;
   pedidoId: number | null;
+  /** La moza que atiende la mesa ocupada. */
+  atiendeId: number | null;
+  atiendeNombre: string | null;
   abiertaDesde: string | null;
   cantidadItems: number;
   total: number;
@@ -29,7 +32,7 @@ export type ItemPedido = {
   subtotal: number;
 };
 
-export type MedioPago = 'EFECTIVO' | 'DEBITO' | 'CREDITO' | 'TRANSFERENCIA';
+export type MedioPago = 'EFECTIVO' | 'DEBITO' | 'CREDITO' | 'TRANSFERENCIA' | 'RAPPI';
 
 export type Pago = {
   id: number;
@@ -41,11 +44,22 @@ export type Pago = {
   fecha: string;
 };
 
+export type TipoPedido = 'MESA' | 'PARA_LLEVAR' | 'DELIVERY';
+
+/** Para llevar y Rappi: en qué anda el pedido. */
+export type EstadoEntrega = 'PREPARANDO' | 'LISTO' | 'ENTREGADO';
+
 export type PedidoDetalle = {
   id: number;
-  tipo: 'MESA' | 'PARA_LLEVAR' | 'DELIVERY';
+  tipo: TipoPedido;
   estado: EstadoPedido;
+  /** "Mesa 4", "Para llevar · Juan", "Rappi · 1234". */
+  titulo: string;
   mesaEtiqueta: string | null;
+  cliente: string | null;
+  entrega: EstadoEntrega | null;
+  atiendeId: number | null;
+  atiendeNombre: string | null;
   abiertoEn: string;
   cerradoEn: string | null;
   items: ItemPedido[];
@@ -164,3 +178,17 @@ export type AlertasStock = { bajos: number; sinStock: number };
 export type Stock = { insumos: Insumo[]; recetas: Receta[]; alertas: AlertasStock };
 
 export type InsumoForm = { nombre: string; unidad: Unidad; cantidad: number | null; minimo: number };
+
+export type PedidoSinMesa = {
+  id: number;
+  tipo: TipoPedido;
+  titulo: string;
+  cliente: string | null;
+  estado: EstadoPedido;
+  entrega: EstadoEntrega;
+  abiertoEn: string;
+  unidades: number;
+  total: number;
+  saldo: number;
+  atiendeNombre: string | null;
+};

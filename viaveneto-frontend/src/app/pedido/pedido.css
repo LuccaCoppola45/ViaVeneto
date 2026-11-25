@@ -1,10 +1,5 @@
-.encabezado { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.encabezado { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }
 .encabezado h1 { margin: 0; font-size: 1.8rem; }
-.volver, .boton-link {
-  display: inline-flex; align-items: center; min-height: 56px; padding: 0 16px;
-  border: 2px solid var(--borde); border-radius: var(--radio); background: #fff;
-  color: var(--texto); text-decoration: none; font-weight: 700;
-}
 .cerrado { margin-bottom: 12px; border-color: var(--ocupada); background: var(--ocupada-fondo); }
 .cerrado p { margin: 0 0 12px; font-weight: 700; }
 
@@ -13,7 +8,6 @@
 .carta { min-width: 0; }
 .categorias { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; }
 .categorias button { flex: 0 0 auto; }
-button.elegido { background: var(--vino); border-color: var(--vino); color: #fff; }
 
 .productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-top: 8px; }
 .producto {
@@ -41,7 +35,6 @@ button.elegido { background: var(--vino); border-color: var(--vino); color: #fff
 .vacio { color: var(--suave); }
 .total { display: flex; justify-content: space-between; padding: 16px 0; font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
 .cerrar { width: 100%; font-size: 1.2rem; }
-.total-modal { font-size: 1.4rem; }
 
 .selector-vista, .pie-movil { display: none; }
 
@@ -73,3 +66,7 @@ button.elegido { background: var(--vino); border-color: var(--vino); color: #fff
 .producto .stock.sin { color: var(--peligro); }
 .producto.agotado { opacity: 1; background: #f3efea; border-style: dashed; }
 .producto.agotado .nombre { text-decoration: line-through; }
+.atiende { display: flex; align-items: center; gap: 8px; margin-left: auto; font-weight: 600; color: var(--suave); }
+.atiende select { min-height: 48px; }
+.entrega { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.entrega button.elegido { background: var(--libre); border-color: var(--libre); color: #fff; }

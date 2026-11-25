@@ -1,15 +1,33 @@
 <div class="encabezado">
-  <a class="volver" routerLink="/mesas" aria-label="Volver a las mesas">‹ Mesas</a>
+  <a class="boton" routerLink="/mesas" aria-label="Volver a las mesas">‹ Mesas</a>
   <h1>{{ titulo() }}</h1>
+  @if (pedido(); as p) {
+    <label class="atiende">Atiende
+      <select [value]="p.atiendeId ?? ''" (change)="pasarA($any($event.target).value)" [disabled]="!abierto()">
+        @if (!p.atiendeId) { <option value="" disabled>Nadie</option> }
+        @for (persona of personas(); track persona.id) {
+          <option [value]="persona.id" [selected]="persona.id === p.atiendeId">{{ persona.nombre }}</option>
+        }
+      </select>
+    </label>
+  }
 </div>
+
+@if (sinMesa() && pedido()!.estado !== 'ANULADO') {
+  <div class="entrega" role="group" aria-label="Estado del pedido">
+    @for (estado of ENTREGAS; track estado) {
+      <button [class.elegido]="pedido()!.entrega === estado" (click)="marcarEntrega(estado)">{{ NOMBRE_ENTREGA[estado] }}</button>
+    }
+  </div>
+}
 
 @if (!pedido()) {
   <p class="cargando">Cargando…</p>
 } @else {
   @if (!abierto()) {
     <div class="tarjeta cerrado">
-      <p>Esta mesa ya se cerró.</p>
-      <a class="boton-link" routerLink="/mesas">Volver a las mesas</a>
+      <p>{{ sinMesa() ? 'Este pedido ya se cobró.' : 'Esta mesa ya se cerró.' }}</p>
+      <a class="boton" routerLink="/mesas">Volver a las mesas</a>
     </div>
   }
 
@@ -93,7 +111,7 @@
             <a class="boton primario" [routerLink]="['/pedidos', pedido()!.id, 'cobrar']">💵 Cobrar</a>
           </div>
         } @else {
-          <button class="cerrar" (click)="confirmandoCierre.set(true)">Liberar mesa</button>
+          <button class="cerrar" (click)="confirmandoCierre.set(true)">{{ sinMesa() ? 'Cancelar pedido' : 'Liberar mesa' }}</button>
         }
       } @else if (pedido()!.estado === 'CERRADO') {
         <button class="cerrar" (click)="imprimirTicket()">🖨️ Imprimir ticket</button>
@@ -114,10 +132,10 @@
 @if (confirmandoCierre()) {
   <div class="fondo-modal" (click)="confirmandoCierre.set(false)">
     <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-      <p>La {{ titulo().toLowerCase() }} no tiene nada cargado. ¿Liberarla?</p>
+      <p>{{ sinMesa() ? '¿Cancelar este pedido? No tiene nada cargado.' : 'La ' + titulo().toLowerCase() + ' no tiene nada cargado. ¿Liberarla?' }}</p>
       <div class="acciones">
         <button (click)="confirmandoCierre.set(false)" [disabled]="cerrando()">No, volver</button>
-        <button class="primario" (click)="cerrar()" [disabled]="cerrando()">Sí, liberar</button>
+        <button class="primario" (click)="cerrar()" [disabled]="cerrando()">{{ sinMesa() ? 'Sí, cancelar' : 'Sí, liberar' }}</button>
       </div>
     </div>
   </div>

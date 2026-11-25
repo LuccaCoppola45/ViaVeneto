@@ -1,5 +1,9 @@
 package ar.viaveneto.pedido;
 
 public enum TipoPedido {
-	MESA, PARA_LLEVAR, DELIVERY
+	MESA,
+	/** Lo pasan a buscar por el mostrador. */
+	PARA_LLEVAR,
+	/** Pedido de Rappi. */
+	DELIVERY
 }

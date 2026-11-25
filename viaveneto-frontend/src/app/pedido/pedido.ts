@@ -3,7 +3,8 @@ import { Router, RouterLink } from '@angular/router';
 import { Api } from '../comun/api';
 import { Avisos } from '../comun/avisos';
 import { PlataPipe } from '../comun/formato';
-import { Categoria, ItemPedido, PedidoDetalle, Producto } from '../comun/modelos';
+import { Categoria, EstadoEntrega, ItemPedido, PedidoDetalle, Persona, Producto } from '../comun/modelos';
+import { NOMBRE_ENTREGA } from '../comun/medios';
 import { refrescarCadaRato } from '../comun/refresco';
 import { abrirTicket } from '../ticket/abrir-ticket';
 
@@ -36,10 +37,11 @@ export class PedidoPagina implements OnInit {
   /** Con esta cantidad o menos, el botón del plato avisa cuántos quedan. */
   protected readonly POCOS = 5;
 
-  protected readonly titulo = computed(() => {
-    const etiqueta = this.pedido()?.mesaEtiqueta;
-    return etiqueta ? `Mesa ${etiqueta}` : 'Pedido';
-  });
+  protected readonly titulo = computed(() => this.pedido()?.titulo ?? 'Pedido');
+  protected readonly sinMesa = computed(() => !!this.pedido() && this.pedido()!.tipo !== 'MESA');
+  protected readonly personas = signal<Persona[]>([]);
+  protected readonly NOMBRE_ENTREGA = NOMBRE_ENTREGA;
+  protected readonly ENTREGAS: EstadoEntrega[] = ['PREPARANDO', 'LISTO', 'ENTREGADO'];
   protected readonly abierto = computed(() => this.pedido()?.estado === 'ABIERTO');
   protected readonly unidades = computed(() => this.pedido()?.items.reduce((suma, i) => suma + i.cantidad, 0) ?? 0);
   protected readonly categoriaElegida = computed(
@@ -97,13 +99,34 @@ export class PedidoPagina implements OnInit {
     abrirTicket(this.id());
   }
 
+  /** Cuando una moza le pasa la mesa a otra. */
+  protected pasarA(usuarioId: string) {
+    this.modificar(() => this.api.pasarA(this.id(), Number(usuarioId)));
+  }
+
+  protected async marcarEntrega(estado: EstadoEntrega) {
+    const pedido = this.pedido();
+    if (estado === 'ENTREGADO' && pedido && pedido.saldo > 0) {
+      this.avisos.error('Antes de entregarlo falta cobrar.');
+      this.router.navigate(['/pedidos', this.id(), 'cobrar']);
+      return;
+    }
+    this.modificar(() => this.api.marcarEntrega(this.id(), estado));
+    if (estado === 'ENTREGADO') {
+      this.avisos.ok(`${this.titulo()} entregado`);
+      this.router.navigate(['/mesas']);
+    }
+  }
+
   protected async cerrar() {
     this.cerrando.set(true);
     await this.cola;
     try {
       const cerrado = await this.api.cerrarPedido(this.id());
       const nombre = this.titulo();
-      this.avisos.ok(cerrado.estado === 'ANULADO' ? `${nombre} liberada` : `${nombre} cerrada`);
+      this.avisos.ok(
+        this.sinMesa() ? `${nombre}: cancelado` : cerrado.estado === 'ANULADO' ? `${nombre} liberada` : `${nombre} cerrada`,
+      );
       this.router.navigate(['/mesas']);
     } catch (error) {
       this.avisos.error((error as Error).message);
@@ -129,9 +152,10 @@ export class PedidoPagina implements OnInit {
 
   private async cargarTodo() {
     try {
-      const [pedido, carta] = await Promise.all([this.api.pedido(this.id()), this.api.carta()]);
+      const [pedido, carta, personas] = await Promise.all([this.api.pedido(this.id()), this.api.carta(), this.api.usuarios()]);
       this.pedido.set(pedido);
       this.carta.set(carta);
+      this.personas.set(personas);
     } catch (error) {
       this.avisos.error((error as Error).message);
     }

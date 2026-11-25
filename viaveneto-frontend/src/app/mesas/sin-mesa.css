@@ -1,0 +1,19 @@
+:host { display: block; }
+.columna { display: flex; flex-direction: column; gap: 10px; }
+h2 { margin: 0; font-size: 1.2rem; }
+.nuevos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.nuevos button { min-height: 60px; padding: 0 8px; }
+.rappi { background: #e4572e; border-color: #e4572e; }
+.pedido {
+  display: flex; flex-direction: column; gap: 6px; padding: 12px; cursor: pointer;
+  border-radius: var(--radio); border: 2px solid var(--ocupada); background: var(--ocupada-fondo);
+}
+.pedido[data-entrega='LISTO'] { border-color: var(--libre); background: var(--libre-fondo); }
+.arriba, .abajo { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.estado { padding: 2px 10px; border-radius: 999px; background: #fff; font-weight: 800; font-size: 0.9rem; }
+.abajo { color: var(--suave); font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+.falta { color: var(--peligro); font-weight: 700; }
+.pagado { color: var(--libre); font-weight: 700; }
+.pedido button { min-height: 52px; }
+.vacio { color: var(--suave); margin: 0; }
+.campo { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; font-weight: 600; }

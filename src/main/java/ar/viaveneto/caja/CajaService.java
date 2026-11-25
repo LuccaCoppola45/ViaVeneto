@@ -85,13 +85,14 @@ public class CajaService {
 
 	/**
 	 * El turno donde se anota un cobro. Si nadie abrió la caja, se abre sola:
-	 * nunca se traba un cobro por eso. Después se le puede corregir el nombre al cerrar.
+	 * nunca se traba un cobro por eso. Queda a nombre de quien hizo ese primer cobro.
 	 */
-	public synchronized Turno turnoParaCobrar() {
+	public synchronized Turno turnoParaCobrar(String quienCobra) {
 		return turnos.findFirstByCerradoEnIsNullOrderByAbiertoEnDesc()
 				.orElseGet(() -> {
 					Sugerencia sugerencia = sugerencia();
-					return turnos.saveAndFlush(new Turno(sugerencia.tipo(), SIN_NOMBRE, sugerencia.fondoInicial(), ahora(), true));
+					String responsable = quienCobra == null || quienCobra.isBlank() ? SIN_NOMBRE : quienCobra;
+					return turnos.saveAndFlush(new Turno(sugerencia.tipo(), responsable, sugerencia.fondoInicial(), ahora(), true));
 				});
 	}
 

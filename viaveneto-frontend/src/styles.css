@@ -57,6 +57,8 @@ a.boton {
   border-radius: var(--radio); border: 2px solid var(--borde); background: var(--tarjeta);
   color: var(--texto); font-weight: 600; text-decoration: none;
 }
+/* Opción elegida en un grupo de botones (pestañas, segmentos) */
+button.elegido { background: var(--vino); border-color: var(--vino); color: #fff; }
 button.primario, a.boton.primario { background: var(--vino); border-color: var(--vino); color: #fff; }
 button.primario:hover:not(:disabled) { background: var(--vino-oscuro); }
 button.peligro { background: var(--peligro); border-color: var(--peligro); color: #fff; }

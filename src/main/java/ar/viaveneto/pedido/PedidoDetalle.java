@@ -8,7 +8,13 @@ public record PedidoDetalle(
 		Long id,
 		TipoPedido tipo,
 		EstadoPedido estado,
+		/** "Mesa 4", "Para llevar · Juan", "Rappi · 1234". */
+		String titulo,
 		String mesaEtiqueta,
+		String cliente,
+		EstadoEntrega entrega,
+		Long atiendeId,
+		String atiendeNombre,
 		LocalDateTime abiertoEn,
 		LocalDateTime cerradoEn,
 		List<Item> items,
@@ -40,7 +46,10 @@ public record PedidoDetalle(
 						p.getFecha()))
 				.toList();
 		String mesaEtiqueta = pedido.getMesa() == null ? null : pedido.getMesa().etiqueta();
-		return new PedidoDetalle(pedido.getId(), pedido.getTipo(), pedido.getEstado(), mesaEtiqueta,
+		Long atiendeId = pedido.getAtiende() == null ? null : pedido.getAtiende().getId();
+		String atiendeNombre = pedido.getAtiende() == null ? null : pedido.getAtiende().getNombre();
+		return new PedidoDetalle(pedido.getId(), pedido.getTipo(), pedido.getEstado(), pedido.titulo(), mesaEtiqueta,
+				pedido.getCliente(), pedido.getEntrega(), atiendeId, atiendeNombre,
 				pedido.getAbiertoEn(), pedido.getCerradoEn(), items, pedido.subtotal(), pedido.getDescuentoPorcentaje(),
 				pedido.descuento(), pedido.total(), pagos, pedido.pagado(), pedido.saldo());
 	}

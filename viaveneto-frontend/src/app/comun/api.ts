@@ -5,7 +5,10 @@ import {
   Caja,
   Categoria,
   AlertasStock,
+  EstadoEntrega,
   EstadoIngreso,
+  PedidoSinMesa,
+  TipoPedido,
   Insumo,
   InsumoForm,
   Stock,
@@ -67,6 +70,14 @@ export class Api {
   salon = () => this.pedir(this.http.get<Salon>('/api/salon'));
   guardarPlano = (form: PlanoForm) => this.pedir(this.http.put<Salon>('/api/salon', form));
   crearSector = (nombre: string) => this.pedir(this.http.post<Sector>('/api/salon/sectores', { nombre }));
+
+  pedidosSinMesa = () => this.pedir(this.http.get<PedidoSinMesa[]>('/api/pedidos/sin-mesa'));
+  abrirSinMesa = (tipo: TipoPedido, cliente: string) =>
+    this.pedir(this.http.post<PedidoDetalle>('/api/pedidos/sin-mesa', { tipo, cliente }));
+  marcarEntrega = (pedidoId: number, estado: EstadoEntrega) =>
+    this.pedir(this.http.put<PedidoDetalle>(`/api/pedidos/${pedidoId}/entrega`, { estado }));
+  pasarA = (pedidoId: number, usuarioId: number) =>
+    this.pedir(this.http.put<PedidoDetalle>(`/api/pedidos/${pedidoId}/atiende`, { usuarioId }));
 
   pedido = (id: number) => this.pedir(this.http.get<PedidoDetalle>(`/api/pedidos/${id}`));
   agregarItem = (pedidoId: number, productoId: number, cantidad = 1) =>

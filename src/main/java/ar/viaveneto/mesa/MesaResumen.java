@@ -18,6 +18,9 @@ public record MesaResumen(
 		boolean vertical,
 		boolean ocupada,
 		Long pedidoId,
+		/** La moza que atiende la mesa ocupada. */
+		Long atiendeId,
+		String atiendeNombre,
 		LocalDateTime abiertaDesde,
 		int cantidadItems,
 		BigDecimal total) {

@@ -50,6 +50,8 @@
     </div>
   }
 
+  <div class="disposicion">
+  <div class="principal">
   @if (sectorActual(); as sector) {
     <div class="plano" [class.modo-arreglo]="arreglo()" [style]="estiloPlano()" [attr.aria-label]="'Plano de ' + sector.nombre">
       @for (elemento of sector.elementos; track $index) {
@@ -60,13 +62,14 @@
       }
       @for (mesa of mesasDelSector(); track mesa.id) {
         <button class="pieza boton-mesa" [style]="estiloMesa(mesa)" [disabled]="abriendo() === mesa.id || trabajando()"
-                [class.elegida]="mesaArreglada()?.id === mesa.id" (click)="tocarMesa(mesa)"
+                [class.elegida]="mesaArreglada()?.id === mesa.id" [class.mia]="misMesas() && esMia(mesa)"
+                [class.ajena]="esAjena(mesa)" (click)="tocarMesa(mesa)"
                 [attr.aria-label]="'Mesa ' + mesa.etiqueta + (mesa.ocupada ? ', ocupada' : ', libre')">
           <app-mesa-dibujo [vertical]="mesa.vertical" [mesitas]="mesa.mesitas" [class.ocupada]="mesa.ocupada">
             <span class="numero">{{ mesa.etiqueta }}</span>
             @if (mesa.ocupada) {
               <span class="total">{{ mesa.total | plata }}</span>
-              <span class="detalle">{{ hace(mesa) }}</span>
+              <span class="detalle">{{ hace(mesa) }}@if (mesa.atiendeNombre) { · {{ mesa.atiendeNombre }}}</span>
             } @else if (arreglo()) {
               <span class="detalle">{{ mesa.mesitas * 2 }} personas</span>
             }
@@ -85,7 +88,13 @@
         <span class="muestra ocupada"></span> Ocupada
         <span class="separador">·</span> Tocá una mesa para cargar el pedido
       </p>
+      <button class="boton-arreglo" [class.elegido]="misMesas()" (click)="cambiarMisMesas()">👤 Mis mesas</button>
       <button class="boton-arreglo" (click)="empezarArreglo()">🪑 Juntar o separar mesas</button>
     </div>
   }
+  </div>
+  @if (!arreglo()) {
+    <app-sin-mesa class="lateral" />
+  }
+  </div>
 }

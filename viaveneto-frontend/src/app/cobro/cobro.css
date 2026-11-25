@@ -16,7 +16,6 @@ h2:first-child { margin-top: 0; }
 
 .segmentos { display: flex; flex-wrap: wrap; gap: 8px; }
 .segmentos button { flex: 1 1 140px; }
-button.elegido { background: var(--vino); border-color: var(--vino); color: #fff; }
 .contador { display: flex; align-items: center; gap: 16px; margin-top: 12px; font-size: 1.2rem; }
 .contador button { width: 64px; padding: 0; font-size: 1.6rem; }
 .contador.chico { gap: 8px; margin: 0; }

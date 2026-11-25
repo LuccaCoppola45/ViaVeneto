@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import ar.viaveneto.acceso.UsuarioActual;
 import ar.viaveneto.pedido.PedidoDetalle;
 import ar.viaveneto.pedido.PedidoService;
 import jakarta.validation.Valid;
@@ -61,7 +63,7 @@ public class MesaController {
 
 	/** Abre la mesa. Si ya estaba abierta devuelve su pedido, así dos mozos que tocan a la vez ven lo mismo. */
 	@PostMapping("/{id}/abrir")
-	public PedidoDetalle abrir(@PathVariable Long id) {
-		return pedidoService.abrirMesa(id);
+	public PedidoDetalle abrir(@PathVariable Long id, @RequestAttribute(UsuarioActual.ATRIBUTO) UsuarioActual usuario) {
+		return pedidoService.abrirMesa(id, usuario.id());
 	}
 }

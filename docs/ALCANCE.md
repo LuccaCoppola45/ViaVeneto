@@ -32,7 +32,7 @@ Lo usan personas sin conocimientos técnicos: botones grandes, pocos pasos, espa
 
 - [x] Parte 1: mesas y pedidos por mesa (con carta editable).
 - [x] Plano del local por sector (planta baja 5, arriba 4, cerramiento 6, afuera 4) y modo "Acomodar salón".
-- [ ] Parte 2: para llevar y delivery.
+- [x] Parte 2: para llevar (a nombre del cliente, Preparando → Listo → Retirado) y Rappi (se cobra con el medio Rappi, aparte del cajón). Cada mesa queda a nombre de la moza que la abre, con "Mis mesas" para resaltar las propias.
 - [x] Parte 3: stock de insumos (por unidad o por receta) que se descuenta al cargar el plato y no deja cargar si no alcanza; panel con lo que hay que comprar y aviso en el menú.
 - [x] Parte 4: cobro (dividir la cuenta, medios de pago, vuelto, propina aparte, 10% por efectivo), ticket y precuenta de 80 mm, notas por plato y caja por turnos (mediodía y noche) con cierre y diferencia.
 - [x] Login con PIN de 4 números por persona (la primera vez se crea el primer usuario). Todos pueden hacer todo.

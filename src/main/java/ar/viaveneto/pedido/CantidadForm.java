@@ -24,6 +24,17 @@ public final class CantidadForm {
 			@Max(value = Pedido.MAXIMO_POR_ITEM, message = "Máximo 99 unidades por producto.") int cantidad) {
 	}
 
+	public record NuevoSinMesa(
+			@NotNull(message = "Elegí si es para llevar o Rappi.") TipoPedido tipo,
+			@Size(max = 60, message = "El nombre es muy largo (máximo 60 letras).") String cliente) {
+	}
+
+	public record Entrega(@NotNull(message = "Elegí el estado.") EstadoEntrega estado) {
+	}
+
+	public record Atiende(@NotNull(message = "Elegí quién atiende.") Long usuarioId) {
+	}
+
 	public record Nota(
 			@Size(max = ItemPedido.LARGO_NOTA, message = "La nota es muy larga (máximo 80 letras).") String nota,
 			boolean soloUna) {

@@ -1,6 +1,5 @@
 .pestanias { display: flex; gap: 8px; margin-bottom: 14px; }
 .pestanias button { flex: 1 1 0; font-size: 1.1rem; }
-button.elegido { background: var(--vino); border-color: var(--vino); color: #fff; }
 .globo { display: inline-grid; place-items: center; min-width: 28px; height: 28px; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--peligro); color: #fff; font-size: 0.95rem; }
 
 .herramientas { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }

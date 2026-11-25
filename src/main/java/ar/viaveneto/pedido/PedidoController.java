@@ -5,10 +5,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+import ar.viaveneto.acceso.UsuarioActual;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +22,27 @@ import lombok.RequiredArgsConstructor;
 public class PedidoController {
 
 	private final PedidoService pedidoService;
+
+	@GetMapping("/sin-mesa")
+	public List<PedidoSinMesa> sinMesa() {
+		return pedidoService.sinMesaEnCurso();
+	}
+
+	@PostMapping("/sin-mesa")
+	public PedidoDetalle abrirSinMesa(@Valid @RequestBody CantidadForm.NuevoSinMesa form,
+			@RequestAttribute(UsuarioActual.ATRIBUTO) UsuarioActual usuario) {
+		return pedidoService.abrirSinMesa(form, usuario.id());
+	}
+
+	@PutMapping("/{id}/entrega")
+	public PedidoDetalle marcarEntrega(@PathVariable Long id, @Valid @RequestBody CantidadForm.Entrega form) {
+		return pedidoService.marcarEntrega(id, form);
+	}
+
+	@PutMapping("/{id}/atiende")
+	public PedidoDetalle pasarA(@PathVariable Long id, @Valid @RequestBody CantidadForm.Atiende form) {
+		return pedidoService.pasarA(id, form);
+	}
 
 	@GetMapping("/{id}")
 	public PedidoDetalle ver(@PathVariable Long id) {
@@ -47,8 +72,9 @@ public class PedidoController {
 	}
 
 	@PostMapping("/{id}/pagos")
-	public PedidoDetalle cobrar(@PathVariable Long id, @Valid @RequestBody CantidadForm.Cobro form) {
-		return pedidoService.cobrar(id, form);
+	public PedidoDetalle cobrar(@PathVariable Long id, @Valid @RequestBody CantidadForm.Cobro form,
+			@RequestAttribute(UsuarioActual.ATRIBUTO) UsuarioActual usuario) {
+		return pedidoService.cobrar(id, form, usuario.nombre());
 	}
 
 	@DeleteMapping("/{id}/pagos/{pagoId}")

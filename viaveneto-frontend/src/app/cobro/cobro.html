@@ -1,27 +1,32 @@
 <div class="encabezado">
   <a class="boton" [routerLink]="['/pedidos', id()]">‹ Volver</a>
-  <h1>Cobrar {{ titulo().toLowerCase() }}</h1>
+  <h1>Cobrar · {{ titulo() }}</h1>
 </div>
 
 @if (pedido(); as p) {
   @if (cobrada()) {
     <section class="tarjeta listo">
-      <p class="grande">✅ {{ titulo() }} cobrada</p>
+      <p class="grande">✅ {{ titulo() }}{{ p.tipo === 'MESA' ? ' cobrada' : ': cobrado' }}</p>
       <p>Total {{ p.total | plata }}</p>
       <div class="botones">
         <button class="primario" (click)="imprimirTicket()">🖨️ Imprimir ticket</button>
         <a class="boton" routerLink="/mesas">Volver a las mesas</a>
+        @if (p.tipo !== 'MESA' && p.entrega !== 'ENTREGADO') {
+          <a class="boton" [routerLink]="['/pedidos', p.id]">Ver el pedido ({{ p.entrega === 'LISTO' ? 'listo' : 'preparando' }})</a>
+        }
       </div>
     </section>
   } @else {
     <div class="columnas">
       <section class="tarjeta resumen">
         <div class="fila"><span>Consumo</span><span>{{ p.subtotal | plata }}</span></div>
+        @if (p.tipo !== 'DELIVERY') {
         <label class="descuento">
           <input type="checkbox" [checked]="conDescuento()" [disabled]="trabajando()" (change)="cambiarDescuento()" />
           {{ DESCUENTO_EFECTIVO }}% de descuento por efectivo
           @if (p.descuento) { <strong>− {{ p.descuento | plata }}</strong> }
         </label>
+        }
         <div class="fila total"><span>Total</span><span>{{ p.total | plata }}</span></div>
         @for (pago of p.pagos; track pago.id) {
           <div class="fila pago">
@@ -74,7 +79,7 @@
 
         <h2>2. ¿Con qué paga?</h2>
         <div class="medios">
-          @for (m of MEDIOS; track m.medio) {
+          @for (m of medios(); track m.medio) {
             <button [class.elegido]="medio() === m.medio" (click)="elegirMedio(m.medio)">
               <span class="icono">{{ m.icono }}</span>{{ m.nombre }}
             </button>
@@ -108,7 +113,7 @@
         </details>
 
         <button class="primario cobrar" [disabled]="!puedeCobrar()" (click)="cobrar()">
-          Cobrar {{ (monto() ?? 0) | plata }}@if (medio()) { con {{ nombreMedio(medio()!).toLowerCase() }} }
+          Cobrar {{ (monto() ?? 0) | plata }}@if (medio()) { con {{ medioEnTexto(medio()!) }} }
         </button>
       </section>
     </div>

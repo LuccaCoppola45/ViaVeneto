@@ -31,14 +31,14 @@
           <div class="medio">
             <span class="nombre">{{ m.icono }} {{ m.nombre }}</span>
             <span class="monto">{{ montoDe(t.resumen, m.medio).monto | plata }}</span>
-            <span class="suave">{{ montoDe(t.resumen, m.medio).cobros }} cobros</span>
+            <span class="suave">{{ montoDe(t.resumen, m.medio).cobros }} cobros{{ m.medio === 'RAPPI' ? ' · lo paga Rappi' : '' }}</span>
           </div>
         }
       </div>
 
       <div class="totales">
         <div><span>Total vendido</span><strong>{{ t.resumen.ventas | plata }}</strong></div>
-        <div><span>Mesas cobradas</span><strong>{{ t.resumen.mesasCobradas }}</strong></div>
+        <div><span>Pedidos cobrados</span><strong>{{ t.resumen.mesasCobradas }}</strong></div>
         <div><span>Descuentos dados</span><strong>{{ t.resumen.descuentos | plata }}</strong></div>
         <div class="propinas"><span>Propinas para repartir</span><strong>{{ t.resumen.propinas | plata }}</strong></div>
       </div>

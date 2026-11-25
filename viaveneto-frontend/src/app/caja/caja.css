@@ -20,7 +20,6 @@
 .botones { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
 .segmentos { display: flex; flex-wrap: wrap; gap: 8px; }
 .segmentos button { flex: 1 1 140px; font-size: 1.15rem; }
-button.elegido { background: var(--vino); border-color: var(--vino); color: #fff; }
 .pregunta { font-weight: 700; margin: 16px 0 8px; }
 .otro { width: 100%; margin-top: 8px; }
 .abrir { width: 100%; margin-top: 18px; min-height: 72px; font-size: 1.3rem; }

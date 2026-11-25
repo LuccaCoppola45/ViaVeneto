@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import ar.viaveneto.acceso.Usuario;
 import ar.viaveneto.caja.Turno;
 import ar.viaveneto.carta.Producto;
 import ar.viaveneto.comun.NoEncontradoException;
@@ -55,6 +56,19 @@ public class Pedido {
 	@Column(nullable = false, length = 20)
 	private EstadoPedido estado;
 
+	/** La moza que lo atiende (la que lo abrió, salvo que lo pasen a otra). */
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Usuario atiende;
+
+	/** Para llevar o Rappi: a nombre de quién está (o el número de pedido de Rappi). */
+	@Column(length = 60)
+	private String cliente;
+
+	/** Solo para pedidos sin mesa. */
+	@Enumerated(EnumType.STRING)
+	@Column(length = 15)
+	private EstadoEntrega entrega;
+
 	@Column(nullable = false)
 	private LocalDateTime abiertoEn;
 
@@ -73,13 +87,53 @@ public class Pedido {
 	@ColumnDefault("0")
 	private int descuentoPorcentaje;
 
-	public static Pedido deMesa(Mesa mesa, LocalDateTime ahora) {
-		Pedido pedido = new Pedido();
-		pedido.tipo = TipoPedido.MESA;
+	public static Pedido deMesa(Mesa mesa, Usuario atiende, LocalDateTime ahora) {
+		Pedido pedido = nuevo(TipoPedido.MESA, atiende, ahora);
 		pedido.mesa = mesa;
+		return pedido;
+	}
+
+	/** Para llevar o Rappi: sin mesa, a nombre de alguien. */
+	public static Pedido sinMesa(TipoPedido tipo, String cliente, Usuario atiende, LocalDateTime ahora) {
+		if (tipo == TipoPedido.MESA) {
+			throw new IllegalArgumentException("Los pedidos de mesa se abren desde la mesa");
+		}
+		Pedido pedido = nuevo(tipo, atiende, ahora);
+		pedido.cliente = cliente == null || cliente.isBlank() ? null : cliente.trim();
+		pedido.entrega = EstadoEntrega.PREPARANDO;
+		return pedido;
+	}
+
+	private static Pedido nuevo(TipoPedido tipo, Usuario atiende, LocalDateTime ahora) {
+		Pedido pedido = new Pedido();
+		pedido.tipo = tipo;
+		pedido.atiende = atiende;
 		pedido.estado = EstadoPedido.ABIERTO;
 		pedido.abiertoEn = ahora;
 		return pedido;
+	}
+
+	public void pasarA(Usuario otra) {
+		this.atiende = otra;
+	}
+
+	public void marcarEntrega(EstadoEntrega estado) {
+		if (entrega == null) {
+			throw new ReglaNegocioException("Las mesas no tienen estado de entrega.");
+		}
+		if (this.estado == EstadoPedido.ANULADO) {
+			throw new ReglaNegocioException("Este pedido se canceló.");
+		}
+		this.entrega = estado;
+	}
+
+	/** Lo que se muestra en pantalla y en el ticket: "Mesa 4", "Para llevar · Juan", "Rappi · 1234". */
+	public String titulo() {
+		return switch (tipo) {
+			case MESA -> "Mesa " + mesa.etiqueta();
+			case PARA_LLEVAR -> cliente == null ? "Para llevar" : "Para llevar · " + cliente;
+			case DELIVERY -> cliente == null ? "Rappi" : "Rappi · " + cliente;
+		};
 	}
 
 	/** Si el producto ya estaba cargado (sin nota) suma unidades en la misma línea. */
@@ -142,6 +196,9 @@ public class Pedido {
 		verificarAbierto();
 		if (items.isEmpty()) {
 			throw new ReglaNegocioException("La mesa no tiene nada cargado para cobrar.");
+		}
+		if (medio == MedioPago.RAPPI && tipo != TipoPedido.DELIVERY) {
+			throw new ReglaNegocioException("Rappi se usa solo para los pedidos de Rappi.");
 		}
 		BigDecimal aCobrar = Plata.redondear(monto);
 		if (aCobrar.signum() <= 0) {

@@ -2,10 +2,13 @@ package ar.viaveneto.pedido;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ar.viaveneto.acceso.Usuario;
+import ar.viaveneto.acceso.UsuarioRepository;
 import ar.viaveneto.caja.CajaService;
 import ar.viaveneto.carta.CartaService;
 import ar.viaveneto.carta.Producto;
@@ -25,17 +28,58 @@ public class PedidoService {
 	private final CartaService cartaService;
 	private final CajaService cajaService;
 	private final StockService stockService;
+	private final UsuarioRepository usuarios;
 	private final Clock reloj;
 
-	/** Si la mesa ya estaba abierta devuelve ese pedido en lugar de fallar. */
 	@Transactional
 	public PedidoDetalle abrirMesa(Long mesaId) {
+		return abrirMesa(mesaId, null);
+	}
+
+	/**
+	 * Si la mesa ya estaba abierta devuelve ese pedido en lugar de fallar.
+	 * La mesa queda a nombre de quien la abre (como la libreta dividida por moza).
+	 */
+	@Transactional
+	public PedidoDetalle abrirMesa(Long mesaId, Long usuarioId) {
 		Mesa mesa = mesas.findByIdParaActualizar(mesaId)
 				.filter(Mesa::isActiva)
 				.orElseThrow(() -> new NoEncontradoException("No existe esa mesa."));
 		Pedido pedido = pedidos.findAbiertoDeMesa(mesaId)
-				.orElseGet(() -> pedidos.save(Pedido.deMesa(mesa, ahora())));
+				.orElseGet(() -> pedidos.save(Pedido.deMesa(mesa, usuario(usuarioId), ahora())));
 		return PedidoDetalle.de(pedido);
+	}
+
+	/** Un pedido para llevar o de Rappi. */
+	@Transactional
+	public PedidoDetalle abrirSinMesa(CantidadForm.NuevoSinMesa form, Long usuarioId) {
+		if (form.tipo() == TipoPedido.MESA) {
+			throw new ReglaNegocioException("Los pedidos de mesa se abren tocando la mesa.");
+		}
+		return PedidoDetalle.de(pedidos.save(Pedido.sinMesa(form.tipo(), form.cliente(), usuario(usuarioId), ahora())));
+	}
+
+	@Transactional(readOnly = true)
+	public List<PedidoSinMesa> sinMesaEnCurso() {
+		return pedidos.findSinMesaEnCurso().stream().map(PedidoSinMesa::de).toList();
+	}
+
+	@Transactional
+	public PedidoDetalle marcarEntrega(Long pedidoId, CantidadForm.Entrega form) {
+		Pedido pedido = paraActualizar(pedidoId);
+		pedido.marcarEntrega(form.estado());
+		return guardar(pedido);
+	}
+
+	/** Cuando una moza le pasa la mesa a otra. */
+	@Transactional
+	public PedidoDetalle pasarA(Long pedidoId, CantidadForm.Atiende form) {
+		Pedido pedido = paraActualizar(pedidoId);
+		Usuario otra = usuarios.findById(form.usuarioId())
+				.filter(Usuario::isActivo)
+				.orElseThrow(() -> new NoEncontradoException("No existe esa persona."));
+		pedido.pasarA(otra);
+		return guardar(pedido);
 	}
 
 	@Transactional(readOnly = true)
@@ -88,8 +132,14 @@ public class PedidoService {
 	/** Registra un pago en el turno de caja abierto (si no hay ninguno, lo abre solo). */
 	@Transactional
 	public PedidoDetalle cobrar(Long pedidoId, CantidadForm.Cobro form) {
+		return cobrar(pedidoId, form, null);
+	}
+
+	@Transactional
+	public PedidoDetalle cobrar(Long pedidoId, CantidadForm.Cobro form, String quienCobra) {
 		Pedido pedido = paraActualizar(pedidoId);
-		pedido.cobrar(cajaService.turnoParaCobrar(), form.medio(), form.monto(), form.propina(), form.recibido(), ahora());
+		pedido.cobrar(cajaService.turnoParaCobrar(quienCobra), form.medio(), form.monto(), form.propina(), form.recibido(),
+				ahora());
 		return guardar(pedido);
 	}
 
@@ -105,6 +155,10 @@ public class PedidoService {
 		Pedido pedido = paraActualizar(pedidoId);
 		pedido.cerrar(ahora());
 		return guardar(pedido);
+	}
+
+	private Usuario usuario(Long usuarioId) {
+		return usuarioId == null ? null : usuarios.findById(usuarioId).orElse(null);
 	}
 
 	private Pedido paraActualizar(Long pedidoId) {

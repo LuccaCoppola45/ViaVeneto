@@ -28,7 +28,7 @@ import { Turno } from '../comun/modelos';
         }
         <div class="corte"></div>
         <div class="linea grande"><span>VENTAS</span><span>{{ t.resumen.ventas | plata }}</span></div>
-        <div class="linea"><span>Mesas cobradas</span><span>{{ t.resumen.mesasCobradas }}</span></div>
+        <div class="linea"><span>Pedidos cobrados</span><span>{{ t.resumen.mesasCobradas }}</span></div>
         @if (t.resumen.descuentos) { <div class="linea"><span>Descuentos</span><span>{{ t.resumen.descuentos | plata }}</span></div> }
         <div class="linea"><span>Propinas (aparte)</span><span>{{ t.resumen.propinas | plata }}</span></div>
         <div class="corte"></div>
