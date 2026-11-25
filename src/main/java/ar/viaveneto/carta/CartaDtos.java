@@ -13,9 +13,16 @@ public final class CartaDtos {
 	private CartaDtos() {
 	}
 
-	public record ProductoVista(Long id, String nombre, BigDecimal precio, Long categoriaId, boolean activo) {
+	/**
+	 * @param disponible cuántos se pueden hacer con el stock que hay; null si el plato no controla stock
+	 */
+	public record ProductoVista(Long id, String nombre, BigDecimal precio, Long categoriaId, boolean activo, Integer disponible) {
 		static ProductoVista de(Producto p) {
-			return new ProductoVista(p.getId(), p.getNombre(), p.getPrecio(), p.getCategoria().getId(), p.isActivo());
+			return de(p, null);
+		}
+
+		static ProductoVista de(Producto p, Integer disponible) {
+			return new ProductoVista(p.getId(), p.getNombre(), p.getPrecio(), p.getCategoria().getId(), p.isActivo(), disponible);
 		}
 	}
 

@@ -13,6 +13,7 @@ import ar.viaveneto.comun.NoEncontradoException;
 import ar.viaveneto.comun.ReglaNegocioException;
 import ar.viaveneto.mesa.Mesa;
 import ar.viaveneto.mesa.MesaRepository;
+import ar.viaveneto.stock.StockService;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,6 +24,7 @@ public class PedidoService {
 	private final MesaRepository mesas;
 	private final CartaService cartaService;
 	private final CajaService cajaService;
+	private final StockService stockService;
 	private final Clock reloj;
 
 	/** Si la mesa ya estaba abierta devuelve ese pedido en lugar de fallar. */
@@ -49,6 +51,7 @@ public class PedidoService {
 		if (!producto.isActivo()) {
 			throw new ReglaNegocioException(producto.getNombre() + " no está disponible en la carta.");
 		}
+		stockService.consumir(producto, form.cantidad());
 		pedido.agregar(producto, form.cantidad());
 		return guardar(pedido);
 	}
@@ -56,7 +59,15 @@ public class PedidoService {
 	@Transactional
 	public PedidoDetalle cambiarCantidad(Long pedidoId, Long itemId, CantidadForm.CambiarCantidad form) {
 		Pedido pedido = paraActualizar(pedidoId);
+		ItemPedido item = pedido.getItems().stream()
+				.filter(i -> i.getId().equals(itemId))
+				.findFirst()
+				.orElseThrow(() -> new NoEncontradoException("Ese producto ya no está en el pedido."));
+		int diferencia = form.cantidad() - item.getCantidad();
+		Producto producto = item.getProducto();
 		pedido.cambiarCantidad(itemId, form.cantidad());
+		// Si suben la cantidad, descuenta; si la bajan o sacan el plato, el stock vuelve.
+		stockService.consumir(producto, diferencia);
 		return guardar(pedido);
 	}
 

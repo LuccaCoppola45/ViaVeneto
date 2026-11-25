@@ -13,6 +13,7 @@ import ar.viaveneto.carta.CartaDtos.ProductoForm;
 import ar.viaveneto.carta.CartaDtos.ProductoVista;
 import ar.viaveneto.comun.NoEncontradoException;
 import ar.viaveneto.comun.ReglaNegocioException;
+import ar.viaveneto.stock.StockService;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,6 +22,7 @@ public class CartaService {
 
 	private final CategoriaRepository categorias;
 	private final ProductoRepository productos;
+	private final StockService stockService;
 
 	/**
 	 * La carta completa agrupada por categoría.
@@ -28,9 +30,10 @@ public class CartaService {
 	 */
 	@Transactional(readOnly = true)
 	public List<CategoriaVista> carta(boolean soloActivos) {
+		Map<Long, Integer> disponibles = stockService.disponibles();
 		Map<Long, List<ProductoVista>> productosPorCategoria = productos.findAllConCategoria().stream()
 				.filter(p -> !soloActivos || p.isActivo())
-				.map(ProductoVista::de)
+				.map(p -> ProductoVista.de(p, disponibles.get(p.getId())))
 				.collect(Collectors.groupingBy(ProductoVista::categoriaId));
 
 		return categorias.findAllByOrderByOrdenAscNombreAsc().stream()

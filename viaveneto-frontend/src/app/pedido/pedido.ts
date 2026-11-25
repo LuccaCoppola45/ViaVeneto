@@ -33,6 +33,8 @@ export class PedidoPagina implements OnInit {
   protected readonly editandoNota = signal<ItemPedido | null>(null);
   protected readonly textoNota = signal('');
   protected readonly NOTAS_RAPIDAS = NOTAS_RAPIDAS;
+  /** Con esta cantidad o menos, el botón del plato avisa cuántos quedan. */
+  protected readonly POCOS = 5;
 
   protected readonly titulo = computed(() => {
     const etiqueta = this.pedido()?.mesaEtiqueta;
@@ -115,6 +117,7 @@ export class PedidoPagina implements OnInit {
     this.cola = this.cola.then(async () => {
       try {
         this.pedido.set(await llamada());
+        this.carta.set(await this.api.carta());
       } catch (error) {
         this.avisos.error((error as Error).message);
         await this.refrescar(true);
@@ -138,7 +141,9 @@ export class PedidoPagina implements OnInit {
   private async refrescar(forzar = false) {
     if (!forzar && (this.pendientes > 0 || this.cerrando())) return;
     try {
-      this.pedido.set(await this.api.pedido(this.id()));
+      const [pedido, carta] = await Promise.all([this.api.pedido(this.id()), this.api.carta()]);
+      this.pedido.set(pedido);
+      this.carta.set(carta);
     } catch {
       // Si falla el refresco automático no molestamos: el próximo lo reintenta.
     }

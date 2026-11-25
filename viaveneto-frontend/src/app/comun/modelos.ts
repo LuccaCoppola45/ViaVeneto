@@ -104,6 +104,8 @@ export type Producto = {
   precio: number;
   categoriaId: number;
   activo: boolean;
+  /** Cuántos se pueden hacer con el stock; null si el plato no controla stock. */
+  disponible: number | null;
 };
 
 export type Categoria = {
@@ -113,7 +115,7 @@ export type Categoria = {
   productos: Producto[];
 };
 
-export type ProductoForm = Omit<Producto, 'id'>;
+export type ProductoForm = Omit<Producto, 'id' | 'disponible'>;
 
 export type TipoElemento =
   | 'PUERTA' | 'BARRA' | 'CAJA' | 'COCINA' | 'ESCALERA' | 'BANIO' | 'VENTANA' | 'PARED' | 'PLANTA';
@@ -131,3 +133,34 @@ export type PlanoForm = {
   mesas: { id: number; sectorId: number; x: number; y: number; vertical: boolean }[];
   elementos: (Elemento & { sectorId: number })[];
 };
+
+export type Persona = { id: number; nombre: string };
+
+export type EstadoIngreso = { hayUsuarios: boolean; usuarios: Persona[] };
+
+export type SesionNueva = { token: string; usuario: Persona };
+
+export type Unidad = 'UNIDAD' | 'KILO' | 'LITRO';
+
+export type EstadoStock = 'OK' | 'BAJO' | 'SIN_STOCK';
+
+export type Insumo = {
+  id: number;
+  nombre: string;
+  unidad: Unidad;
+  cantidad: number;
+  minimo: number;
+  estado: EstadoStock;
+  /** Platos que lo descuentan. */
+  usadoEn: string[];
+};
+
+export type LineaReceta = { insumoId: number; insumo: string; unidad: Unidad; cantidad: number };
+
+export type Receta = { productoId: number; producto: string; categoria: string; activo: boolean; lineas: LineaReceta[] };
+
+export type AlertasStock = { bajos: number; sinStock: number };
+
+export type Stock = { insumos: Insumo[]; recetas: Receta[]; alertas: AlertasStock };
+
+export type InsumoForm = { nombre: string; unidad: Unidad; cantidad: number | null; minimo: number };

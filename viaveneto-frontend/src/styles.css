@@ -83,6 +83,12 @@ input, select {
   color: #fff; text-decoration: none; font-weight: 600; border-radius: 10px;
 }
 .barra nav a.activo { background: rgba(255, 255, 255, 0.18); }
+.alerta-stock { margin-left: 6px; padding: 2px 8px; border-radius: 999px; background: #ffd54a; color: #4a3500; font-size: 0.9rem; font-weight: 800; }
+.barra .quien {
+  min-height: 52px; padding: 0 14px; border-radius: 10px; font-size: 0.95rem;
+  background: transparent; border: 2px solid rgba(255, 255, 255, 0.4); color: #fff;
+}
+.barra nav { flex-wrap: wrap; justify-content: flex-end; }
 
 .aviso {
   position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 50;

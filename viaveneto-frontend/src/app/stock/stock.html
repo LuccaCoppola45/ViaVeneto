@@ -1,0 +1,142 @@
+<h1>Stock</h1>
+
+<div class="pestanias" role="tablist">
+  <button role="tab" [class.elegido]="pestania() === 'insumos'" (click)="pestania.set('insumos')">
+    Qué hay
+    @if (paraComprar()) { <span class="globo">{{ paraComprar() }}</span> }
+  </button>
+  <button role="tab" [class.elegido]="pestania() === 'recetas'" (click)="pestania.set('recetas')">Qué descuenta cada plato</button>
+</div>
+
+@if (!stock()) {
+  <p class="cargando">Cargando…</p>
+} @else if (pestania() === 'insumos') {
+  <div class="herramientas">
+    <div class="segmentos">
+      <button [class.elegido]="filtro() === 'todos'" (click)="filtro.set('todos')">Todo</button>
+      <button [class.elegido]="filtro() === 'comprar'" (click)="filtro.set('comprar')">Hay que comprar ({{ paraComprar() }})</button>
+    </div>
+    <input class="buscar" type="search" placeholder="Buscar…" [value]="busqueda()" (input)="busqueda.set($any($event.target).value)" />
+    <button class="primario" (click)="agregando.set(!agregando())">+ Agregar insumo</button>
+  </div>
+
+  @if (agregando()) {
+    <section class="tarjeta fila-form">
+      <label class="ancho">Nombre<input [(ngModel)]="nuevo.nombre" placeholder="Ej. Harina" maxlength="60" /></label>
+      <label>Se cuenta en
+        <select [(ngModel)]="nuevo.unidad">
+          @for (u of UNIDADES; track u.valor) { <option [ngValue]="u.valor">{{ u.nombre }}</option> }
+        </select>
+      </label>
+      <label>Hay ahora<input type="number" inputmode="decimal" min="0" step="any" [(ngModel)]="nuevo.cantidad" placeholder="0" /></label>
+      <label>Avisar con<input type="number" inputmode="decimal" min="0" step="any" [(ngModel)]="nuevo.minimo" /></label>
+      <button class="primario" [disabled]="trabajando()" (click)="agregarInsumo()">Agregar</button>
+    </section>
+  }
+
+  <div class="insumos">
+    @for (insumo of insumosVisibles(); track insumo.id) {
+      <div class="insumo tarjeta" [attr.data-estado]="insumo.estado">
+        <div class="datos">
+          <strong class="nombre">{{ insumo.nombre }}</strong>
+          <span class="estado">{{ nombreEstado(insumo.estado) }}</span>
+          @if (insumo.usadoEn.length) { <span class="usado">Lo usan: {{ insumo.usadoEn.join(', ') }}</span> }
+          @else { <span class="usado">Ningún plato lo descuenta</span> }
+        </div>
+        <div class="cantidad">
+          <span class="hay">{{ insumo.cantidad | cantidad: insumo.unidad }}</span>
+          <span class="minimo">avisa con {{ insumo.minimo | cantidad: insumo.unidad }}</span>
+        </div>
+        <div class="acciones">
+          <button class="primario" (click)="abrirAccion('compra', insumo)">+ Llegó</button>
+          <button (click)="abrirAccion('conteo', insumo)">Conté</button>
+          <button (click)="abrirAccion('editar', insumo)">Editar</button>
+        </div>
+      </div>
+    } @empty {
+      <p class="cargando">{{ filtro() === 'comprar' ? '¡No hace falta comprar nada!' : 'Todavía no hay insumos cargados.' }}</p>
+    }
+  </div>
+} @else {
+  <p class="ayuda">
+    Elegí qué descuenta cada plato cuando se carga en una mesa. <strong>Por unidad</strong> sirve para lo que se vende tal cual se compra
+    (latas, botellas, empanadas). <strong>Receta</strong> para lo que se cocina (1 milanesa + 0,25 kg de papas).
+  </p>
+  @for (grupo of recetasPorCategoria(); track grupo.categoria) {
+    <h2>{{ grupo.categoria }}</h2>
+    <div class="recetas">
+      @for (receta of grupo.recetas; track receta.productoId) {
+        <div class="receta tarjeta">
+          <div class="datos">
+            <strong>{{ receta.producto }}</strong>
+            <span class="usado" [class.sin]="!receta.lineas.length">{{ resumenReceta(receta) }}</span>
+          </div>
+          <div class="acciones">
+            <button [disabled]="trabajando()" (click)="porUnidad(receta)">Por unidad</button>
+            <button (click)="abrirReceta(receta)">Receta</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+}
+
+@if (accion(); as a) {
+  <div class="fondo-modal" (click)="accion.set(null)">
+    <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      @switch (a.tipo) {
+        @case ('compra') {
+          <p><strong>Llegó {{ a.insumo.nombre }}</strong></p>
+          <p class="ayuda">Hay {{ a.insumo.cantidad | cantidad: a.insumo.unidad }}. ¿Cuánto llegó? Se suma.</p>
+          <input class="grande" type="number" inputmode="decimal" min="0" step="any" [(ngModel)]="valorAccion" autofocus />
+        }
+        @case ('conteo') {
+          <p><strong>Contaste {{ a.insumo.nombre }}</strong></p>
+          <p class="ayuda">¿Cuánto hay de verdad? Reemplaza lo que dice el sistema.</p>
+          <input class="grande" type="number" inputmode="decimal" min="0" step="any" [(ngModel)]="valorAccion" autofocus />
+        }
+        @case ('editar') {
+          <p><strong>Editar {{ a.insumo.nombre }}</strong></p>
+          <label class="campo">Nombre<input [(ngModel)]="edicion.nombre" maxlength="60" /></label>
+          <label class="campo">Se cuenta en
+            <select [(ngModel)]="edicion.unidad">
+              @for (u of UNIDADES; track u.valor) { <option [ngValue]="u.valor">{{ u.nombre }}</option> }
+            </select>
+          </label>
+          <label class="campo">Avisar cuando quede<input type="number" inputmode="decimal" min="0" step="any" [(ngModel)]="edicion.minimo" /></label>
+          <button class="quitar" (click)="quitar(a.insumo)">Dejar de controlar este insumo</button>
+        }
+      }
+      <div class="acciones">
+        <button (click)="accion.set(null)">Cancelar</button>
+        <button class="primario" [disabled]="trabajando()" (click)="confirmarAccion()">Guardar</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (editandoReceta(); as receta) {
+  <div class="fondo-modal" (click)="editandoReceta.set(null)">
+    <div class="modal ancho" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <p><strong>¿Qué gasta 1 {{ receta.producto }}?</strong></p>
+      @for (linea of lineas; track $index) {
+        <div class="linea">
+          <select [(ngModel)]="linea.insumoId">
+            <option [ngValue]="null" disabled>Elegí el insumo</option>
+            @for (insumo of stock()!.insumos; track insumo.id) { <option [ngValue]="insumo.id">{{ insumo.nombre }}</option> }
+          </select>
+          <input type="number" inputmode="decimal" min="0" step="any" [(ngModel)]="linea.cantidad" placeholder="Cantidad" />
+          <span class="unidad">{{ sufijoDe(linea.insumoId) }}</span>
+          <button (click)="sacarLinea($index)" aria-label="Sacar renglón">✕</button>
+        </div>
+      }
+      <button (click)="sumarLinea()">+ Otro insumo</button>
+      <p class="ayuda">¿Falta un insumo? Agregalo primero en "Qué hay".</p>
+      <div class="acciones tres">
+        <button class="quitar" (click)="guardarReceta(true)">No controlar</button>
+        <button (click)="editandoReceta.set(null)">Cancelar</button>
+        <button class="primario" [disabled]="trabajando()" (click)="guardarReceta()">Guardar</button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,46 @@
+.pestanias { display: flex; gap: 8px; margin-bottom: 14px; }
+.pestanias button { flex: 1 1 0; font-size: 1.1rem; }
+button.elegido { background: var(--vino); border-color: var(--vino); color: #fff; }
+.globo { display: inline-grid; place-items: center; min-width: 28px; height: 28px; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--peligro); color: #fff; font-size: 0.95rem; }
+
+.herramientas { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+.segmentos { display: flex; gap: 8px; }
+.buscar { flex: 1 1 180px; }
+.fila-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
+.fila-form label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; flex: 0 1 150px; }
+.fila-form .ancho { flex: 1 1 220px; }
+
+.insumos, .recetas { display: grid; gap: 10px; }
+.insumo, .receta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; border-left: 8px solid var(--libre); }
+.insumo[data-estado='BAJO'] { border-left-color: #e0a100; background: #fffaf0; }
+.insumo[data-estado='SIN_STOCK'] { border-left-color: var(--peligro); background: #fff3f2; }
+.receta { border-left-color: var(--borde); }
+.datos { display: flex; flex-direction: column; gap: 2px; flex: 1 1 220px; }
+.nombre { font-size: 1.15rem; }
+.estado { font-weight: 700; color: var(--libre); }
+[data-estado='BAJO'] .estado { color: #8a6400; }
+[data-estado='SIN_STOCK'] .estado { color: var(--peligro); }
+.usado { color: var(--suave); font-size: 0.95rem; }
+.usado.sin { font-style: italic; }
+.cantidad { display: flex; flex-direction: column; align-items: flex-end; min-width: 120px; }
+.hay { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.minimo { color: var(--suave); font-size: 0.9rem; }
+.acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.acciones button { min-height: 52px; }
+.ayuda { color: var(--suave); }
+
+.modal.ancho { max-width: 560px; }
+.modal .grande { width: 100%; font-size: 1.6rem; font-weight: 700; }
+.campo { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; font-weight: 600; }
+.linea { display: grid; grid-template-columns: minmax(0, 1fr) 110px 44px 52px; gap: 8px; align-items: center; margin-bottom: 8px; }
+.linea .unidad { color: var(--suave); font-weight: 700; }
+.linea button { min-height: 52px; padding: 0; }
+.quitar { border-color: transparent; color: var(--peligro); }
+.modal .acciones { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal .acciones.tres { grid-template-columns: 1fr 1fr 1fr; }
+
+@media (max-width: 600px) {
+  .cantidad { align-items: flex-start; }
+  .linea { grid-template-columns: minmax(0, 1fr) 90px 52px; }
+  .linea .unidad { display: none; }
+}

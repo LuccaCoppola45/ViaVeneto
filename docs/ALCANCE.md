@@ -33,6 +33,6 @@ Lo usan personas sin conocimientos técnicos: botones grandes, pocos pasos, espa
 - [x] Parte 1: mesas y pedidos por mesa (con carta editable).
 - [x] Plano del local por sector (planta baja 5, arriba 4, cerramiento 6, afuera 4) y modo "Acomodar salón".
 - [ ] Parte 2: para llevar y delivery.
-- [ ] Parte 3: stock y alertas.
+- [x] Parte 3: stock de insumos (por unidad o por receta) que se descuenta al cargar el plato y no deja cargar si no alcanza; panel con lo que hay que comprar y aviso en el menú.
 - [x] Parte 4: cobro (dividir la cuenta, medios de pago, vuelto, propina aparte, 10% por efectivo), ticket y precuenta de 80 mm, notas por plato y caja por turnos (mediodía y noche) con cierre y diferencia.
-- [ ] Antes de subir a Render: login (está pensado para la red pública).
+- [x] Login con PIN de 4 números por persona (la primera vez se crea el primer usuario). Todos pueden hacer todo.

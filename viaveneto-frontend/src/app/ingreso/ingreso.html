@@ -1,0 +1,49 @@
+<div class="ingreso">
+  @if (cargando()) {
+    <p class="cargando">Cargando…</p>
+  } @else if (!hayUsuarios()) {
+    <h1>¡Bienvenido a Via Veneto!</h1>
+    @switch (paso()) {
+      @case ('nombre') {
+        <p class="explicacion">Es la primera vez que se usa el sistema. Creá tu usuario: después vas a poder agregar a los demás.</p>
+        <label class="campo">Tu nombre
+          <input [value]="nombreNuevo()" (input)="nombreNuevo.set($any($event.target).value)" maxlength="30"
+                 (keydown.enter)="seguirConElPin()" autofocus />
+        </label>
+        <button class="primario grande" (click)="seguirConElPin()">Seguir</button>
+      }
+      @case ('pin') { <p class="explicacion">Elegí un PIN de 4 números, {{ nombreNuevo() }}.</p> }
+      @case ('repetir') { <p class="explicacion">Poné el mismo PIN otra vez para confirmarlo.</p> }
+    }
+  } @else if (!elegida()) {
+    <h1>¿Quién sos?</h1>
+    <div class="personas">
+      @for (persona of personas(); track persona.id) {
+        <button class="persona" (click)="elegir(persona)">{{ persona.nombre }}</button>
+      }
+    </div>
+  } @else {
+    <h1>Hola, {{ elegida()!.nombre }}</h1>
+    <p class="explicacion">Poné tu PIN</p>
+  }
+
+  @if (!cargando() && ((hayUsuarios() && elegida()) || (!hayUsuarios() && paso() !== 'nombre'))) {
+    <div class="puntos" [class.error]="error()" aria-live="polite" [attr.aria-label]="pin().length + ' de ' + LARGO_PIN + ' números'">
+      @for (lleno of puntos(); track $index) { <span [class.lleno]="lleno"></span> }
+    </div>
+    <div class="teclado">
+      @for (tecla of TECLAS; track tecla) {
+        <button (click)="tocar(tecla)" [disabled]="trabajando()">{{ tecla }}</button>
+      }
+      <button class="chica" (click)="hayUsuarios() ? otraPersona() : paso.set('nombre')" [disabled]="trabajando()">
+        {{ hayUsuarios() ? 'Otra persona' : 'Volver' }}
+      </button>
+      <button (click)="tocar('0')" [disabled]="trabajando()">0</button>
+      <button class="chica" (click)="borrar()" [disabled]="trabajando()" aria-label="Borrar">⌫</button>
+    </div>
+  }
+
+  @if (error()) {
+    <p class="mensaje-error" role="alert">{{ error() }}</p>
+  }
+</div>

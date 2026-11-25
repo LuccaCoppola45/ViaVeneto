@@ -69,3 +69,7 @@ button.elegido { background: var(--vino); border-color: var(--vino); color: #fff
 .chips button { min-height: 48px; padding: 0 14px; }
 .texto-nota { width: 100%; }
 .sacar-nota { width: 100%; margin-top: 12px; border-color: transparent; color: var(--peligro); }
+.producto .stock { font-size: 0.85rem; font-weight: 800; color: #8a6400; }
+.producto .stock.sin { color: var(--peligro); }
+.producto.agotado { opacity: 1; background: #f3efea; border-style: dashed; }
+.producto.agotado .nombre { text-decoration: line-through; }

@@ -4,6 +4,13 @@ import { firstValueFrom, Observable } from 'rxjs';
 import {
   Caja,
   Categoria,
+  AlertasStock,
+  EstadoIngreso,
+  Insumo,
+  InsumoForm,
+  Stock,
+  Persona,
+  SesionNueva,
   CobroForm,
   MesaResumen,
   PedidoDetalle,
@@ -20,6 +27,31 @@ import {
 @Injectable({ providedIn: 'root' })
 export class Api {
   private readonly http = inject(HttpClient);
+
+  estadoIngreso = () => this.pedir(this.http.get<EstadoIngreso>('/api/auth/estado'));
+  ingresar = (usuarioId: number, pin: string) =>
+    this.pedir(this.http.post<SesionNueva>('/api/auth/ingresar', { usuarioId, pin }));
+  crearPrimerUsuario = (nombre: string, pin: string) =>
+    this.pedir(this.http.post<SesionNueva>('/api/auth/primer-usuario', { nombre, pin }));
+  salir = () => this.pedir(this.http.post<void>('/api/auth/salir', {}));
+  usuarios = () => this.pedir(this.http.get<Persona[]>('/api/usuarios'));
+  crearUsuario = (nombre: string, pin: string) => this.pedir(this.http.post<Persona>('/api/usuarios', { nombre, pin }));
+  cambiarPin = (id: number, pin: string) => this.pedir(this.http.put<void>(`/api/usuarios/${id}/pin`, { pin }));
+  quitarUsuario = (id: number) => this.pedir(this.http.delete<void>(`/api/usuarios/${id}`));
+
+  stock = () => this.pedir(this.http.get<Stock>('/api/stock'));
+  alertasStock = () => this.pedir(this.http.get<AlertasStock>('/api/stock/alertas'));
+  crearInsumo = (form: InsumoForm) => this.pedir(this.http.post<Insumo>('/api/stock/insumos', form));
+  editarInsumo = (id: number, form: InsumoForm) => this.pedir(this.http.put<Insumo>(`/api/stock/insumos/${id}`, form));
+  cargarCompra = (id: number, cantidad: number) =>
+    this.pedir(this.http.post<Insumo>(`/api/stock/insumos/${id}/compra`, { cantidad }));
+  registrarConteo = (id: number, cantidad: number) =>
+    this.pedir(this.http.post<Insumo>(`/api/stock/insumos/${id}/conteo`, { cantidad }));
+  quitarInsumo = (id: number) => this.pedir(this.http.delete<void>(`/api/stock/insumos/${id}`));
+  guardarReceta = (productoId: number, lineas: { insumoId: number; cantidad: number }[]) =>
+    this.pedir(this.http.put<void>(`/api/stock/recetas/${productoId}`, { lineas }));
+  controlarPorUnidad = (productoId: number) =>
+    this.pedir(this.http.post<Insumo>(`/api/stock/recetas/${productoId}/por-unidad`, {}));
 
   mesas = () => this.pedir(this.http.get<MesaResumen[]>('/api/mesas'));
   agregarMesa = (numero: number, sectorId?: number) =>

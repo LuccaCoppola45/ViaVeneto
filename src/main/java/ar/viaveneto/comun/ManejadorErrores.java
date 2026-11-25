@@ -6,6 +6,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import ar.viaveneto.acceso.NoAutorizadoException;
+
 /** Devuelve los errores como { "detail": "mensaje para mostrar en pantalla" }. */
 @RestControllerAdvice
 public class ManejadorErrores {
@@ -18,6 +20,11 @@ public class ManejadorErrores {
 	@ExceptionHandler(ReglaNegocioException.class)
 	ProblemDetail reglaNegocio(ReglaNegocioException e) {
 		return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+	}
+
+	@ExceptionHandler(NoAutorizadoException.class)
+	ProblemDetail noAutorizado(NoAutorizadoException e) {
+		return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.getMessage());
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)

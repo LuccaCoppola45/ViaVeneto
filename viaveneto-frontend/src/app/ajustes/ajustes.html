@@ -63,3 +63,26 @@
   </div>
   <p class="ayuda">Las mesas nuevas aparecen en la planta baja: después ubicalas desde “Acomodar el salón”. Las mesas ocupadas no se pueden quitar hasta que se cierren.</p>
 </section>
+
+<h2>Personas que usan el sistema</h2>
+<section class="tarjeta">
+  <div class="personas">
+    @for (persona of personas(); track persona.id) {
+      <div class="persona">
+        <strong>{{ persona.nombre }}@if (persona.id === sesion.usuario()?.id) { <small>(vos)</small> }</strong>
+        <button [disabled]="guardando()" (click)="cambiarPin(persona)">Cambiar PIN</button>
+        @if (persona.id !== sesion.usuario()?.id) {
+          <button [disabled]="guardando()" (click)="quitarPersona(persona)">Quitar</button>
+        }
+      </div>
+    }
+  </div>
+  <div class="fila-form">
+    <label>Nombre<input [(ngModel)]="nuevaPersona.nombre" placeholder="Ej. Abuela" maxlength="30" /></label>
+    <label class="angosto">PIN (4 números)
+      <input type="password" inputmode="numeric" maxlength="4" autocomplete="new-password" [(ngModel)]="nuevaPersona.pin" />
+    </label>
+    <button class="primario" [disabled]="guardando()" (click)="agregarPersona()">Agregar persona</button>
+  </div>
+  <p class="ayuda">Cada uno entra tocando su nombre y poniendo su PIN.</p>
+</section>

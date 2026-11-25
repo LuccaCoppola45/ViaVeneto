@@ -16,7 +16,9 @@ cd viaveneto-frontend && npm start -- --port 4300
 ```
 
 Abrir http://localhost:4300. El backend corre en el puerto 8081 (el 8080 queda para la peluquería) y Angular le pasa `/api` por el proxy.
-La primera vez se cargan 15 mesas y una carta de ejemplo; se editan desde "Carta y mesas".
+La primera vez se carga el local (4 sectores, 19 mesas), una carta y un stock de ejemplo; se editan desde "Carta y mesas" y "Stock".
+
+**Ingreso:** la primera vez que se abre, el sistema pide crear la primera persona con un PIN de 4 números. Las demás se agregan desde "Carta y mesas → Personas". No hay usuarios ni PIN de fábrica.
 
 Para probar desde una tablet en la misma red: `npm start -- --port 4300 --host 0.0.0.0` y entrar a `http://<ip-de-la-compu>:4300`.
 

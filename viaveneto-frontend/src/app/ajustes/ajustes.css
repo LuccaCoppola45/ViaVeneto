@@ -17,3 +17,8 @@ label.check input { width: 28px; height: 28px; min-height: 0; }
 .acomodar { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; color: var(--texto); text-decoration: none; border: 2px solid var(--vino); }
 .acomodar .icono { font-size: 2.2rem; }
 .acomodar .flecha { margin-left: auto; font-size: 2rem; color: var(--vino); }
+.personas { display: grid; gap: 8px; margin-bottom: 16px; }
+.persona { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 0; border-bottom: 1px solid var(--borde); }
+.persona strong { margin-right: auto; font-size: 1.1rem; }
+.persona small { color: var(--suave); font-weight: 600; }
+.persona button { min-height: 48px; }

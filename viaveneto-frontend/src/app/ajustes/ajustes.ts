@@ -3,7 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Api } from '../comun/api';
 import { Avisos } from '../comun/avisos';
-import { Categoria, MesaResumen, Producto } from '../comun/modelos';
+import { Categoria, MesaResumen, Persona, Producto } from '../comun/modelos';
+import { Sesion } from '../comun/sesion';
 
 type ProductoEditable = Producto & { cambiado: boolean };
 
@@ -17,6 +18,9 @@ type ProductoEditable = Producto & { cambiado: boolean };
 export class Ajustes {
   private readonly api = inject(Api);
   private readonly avisos = inject(Avisos);
+  protected readonly sesion = inject(Sesion);
+  protected readonly personas = signal<Persona[]>([]);
+  protected nuevaPersona = { nombre: '', pin: '' };
 
   protected readonly categorias = signal<Categoria[]>([]);
   protected readonly productos = signal<ProductoEditable[]>([]);
@@ -93,9 +97,46 @@ export class Ajustes {
     });
   }
 
+  protected async agregarPersona() {
+    const { nombre, pin } = this.nuevaPersona;
+    if (!nombre.trim() || !/^\d{4}$/.test(pin)) {
+      this.avisos.error('Poné el nombre y un PIN de 4 números.');
+      return;
+    }
+    await this.hacer(async () => {
+      await this.api.crearUsuario(nombre, pin);
+      this.avisos.ok(`${nombre.trim()} ya puede entrar con su PIN`);
+      this.nuevaPersona = { nombre: '', pin: '' };
+      this.personas.set(await this.api.usuarios());
+    });
+  }
+
+  protected async cambiarPin(persona: Persona) {
+    const pin = prompt(`Nuevo PIN de 4 números para ${persona.nombre}:`);
+    if (pin === null) return;
+    if (!/^\d{4}$/.test(pin)) {
+      this.avisos.error('El PIN tiene que ser de 4 números.');
+      return;
+    }
+    await this.hacer(async () => {
+      await this.api.cambiarPin(persona.id, pin);
+      this.avisos.ok(`PIN de ${persona.nombre} cambiado`);
+    });
+  }
+
+  protected async quitarPersona(persona: Persona) {
+    if (!confirm(`¿Quitar a ${persona.nombre}? Ya no va a poder entrar.`)) return;
+    await this.hacer(async () => {
+      await this.api.quitarUsuario(persona.id);
+      this.avisos.ok(`${persona.nombre} ya no puede entrar`);
+      this.personas.set(await this.api.usuarios());
+    });
+  }
+
   private async cargar() {
     try {
-      const [carta, mesas] = await Promise.all([this.api.carta(false), this.api.mesas()]);
+      const [carta, mesas, personas] = await Promise.all([this.api.carta(false), this.api.mesas(), this.api.usuarios()]);
+      this.personas.set(personas);
       this.categorias.set(carta);
       this.productos.set(carta.flatMap((c) => c.productos.map((p) => ({ ...p, cambiado: false }))));
       this.mesas.set(mesas);

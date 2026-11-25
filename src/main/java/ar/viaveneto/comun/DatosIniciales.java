@@ -19,6 +19,11 @@ import ar.viaveneto.salon.ElementoPlanoRepository;
 import ar.viaveneto.salon.Sector;
 import ar.viaveneto.salon.SectorRepository;
 import ar.viaveneto.salon.TipoElemento;
+import ar.viaveneto.stock.Insumo;
+import ar.viaveneto.stock.InsumoRepository;
+import ar.viaveneto.stock.RecetaItem;
+import ar.viaveneto.stock.RecetaItemRepository;
+import ar.viaveneto.stock.Unidad;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -33,6 +38,8 @@ public class DatosIniciales implements ApplicationRunner {
 	private final MesaRepository mesas;
 	private final SectorRepository sectores;
 	private final ElementoPlanoRepository elementos;
+	private final InsumoRepository insumos;
+	private final RecetaItemRepository recetas;
 	private final CategoriaRepository categorias;
 	private final ProductoRepository productos;
 
@@ -44,6 +51,9 @@ public class DatosIniciales implements ApplicationRunner {
 		}
 		if (categorias.count() == 0) {
 			cargarCarta();
+		}
+		if (insumos.count() == 0) {
+			cargarStock();
 		}
 	}
 
@@ -115,6 +125,33 @@ public class DatosIniciales implements ApplicationRunner {
 		producto("Gaseosa 500 ml", 3500, bebidas);
 		producto("Cerveza 1 L", 8000, bebidas);
 		producto("Vino de la casa (copa)", 5000, bebidas);
+	}
+
+	/** Stock de ejemplo: bebidas y empanadas por unidad, la milanesa y el vino por receta. */
+	private void cargarStock() {
+		porUnidad("Agua sin gas 500 ml", 24, 6);
+		porUnidad("Gaseosa 500 ml", 24, 6);
+		porUnidad("Cerveza 1 L", 24, 6);
+		porUnidad("Empanada de carne", 48, 12);
+
+		Insumo milanesas = insumos.save(new Insumo("Milanesas de carne", Unidad.UNIDAD, BigDecimal.valueOf(30), BigDecimal.valueOf(5)));
+		Insumo papas = insumos.save(new Insumo("Papas", Unidad.KILO, BigDecimal.valueOf(10), BigDecimal.valueOf(2)));
+		Insumo vino = insumos.save(new Insumo("Vino de la casa", Unidad.LITRO, BigDecimal.valueOf(6), BigDecimal.ONE));
+		receta("Milanesa napolitana con papas", milanesas, "1");
+		receta("Milanesa napolitana con papas", papas, "0.25");
+		receta("Vino de la casa (copa)", vino, "0.15");
+	}
+
+	private void porUnidad(String nombreProducto, int cantidad, int minimo) {
+		productos.findAll().stream().filter(p -> p.getNombre().equals(nombreProducto)).findFirst().ifPresent(producto -> {
+			Insumo insumo = insumos.save(new Insumo(nombreProducto, Unidad.UNIDAD, BigDecimal.valueOf(cantidad), BigDecimal.valueOf(minimo)));
+			recetas.save(new RecetaItem(producto, insumo, BigDecimal.ONE));
+		});
+	}
+
+	private void receta(String nombreProducto, Insumo insumo, String cantidad) {
+		productos.findAll().stream().filter(p -> p.getNombre().equals(nombreProducto)).findFirst()
+				.ifPresent(producto -> recetas.save(new RecetaItem(producto, insumo, new BigDecimal(cantidad))));
 	}
 
 	private void producto(String nombre, int precio, Categoria categoria) {

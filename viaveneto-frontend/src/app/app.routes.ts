@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
+import { conSesion } from './comun/con-sesion';
 
-export const routes: Routes = [
+/** Todo lo que se ve después de poner el PIN. */
+const conPin: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'mesas' },
   { path: 'mesas', title: 'Mesas · Via Veneto', loadComponent: () => import('./mesas/mesas').then((m) => m.Mesas) },
   {
@@ -24,6 +26,7 @@ export const routes: Routes = [
     title: 'Pedido · Via Veneto',
     loadComponent: () => import('./pedido/pedido').then((m) => m.PedidoPagina),
   },
+  { path: 'stock', title: 'Stock · Via Veneto', loadComponent: () => import('./stock/stock').then((m) => m.StockPagina) },
   { path: 'carta', title: 'Carta y mesas · Via Veneto', loadComponent: () => import('./ajustes/ajustes').then((m) => m.Ajustes) },
   {
     path: 'salon',
@@ -35,4 +38,13 @@ export const routes: Routes = [
     ],
   },
   { path: '**', redirectTo: 'mesas' },
+];
+
+export const routes: Routes = [
+  {
+    path: 'ingresar',
+    title: 'Ingresar · Via Veneto',
+    loadComponent: () => import('./ingreso/ingreso').then((m) => m.Ingreso),
+  },
+  { path: '', canActivateChild: [conSesion], children: conPin },
 ];

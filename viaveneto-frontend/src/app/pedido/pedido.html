@@ -33,9 +33,15 @@
       </div>
       <div class="productos">
         @for (producto of categoriaElegida()?.productos; track producto.id) {
-          <button class="producto" [disabled]="!abierto()" (click)="agregar(producto)">
+          <button class="producto" [class.agotado]="producto.disponible === 0" [disabled]="!abierto() || producto.disponible === 0"
+                  (click)="agregar(producto)">
             <span class="nombre">{{ producto.nombre }}</span>
             <span class="precio">{{ producto.precio | plata }}</span>
+            @if (producto.disponible === 0) {
+              <span class="stock sin">Sin stock</span>
+            } @else if (producto.disponible !== null && producto.disponible <= POCOS) {
+              <span class="stock">Quedan {{ producto.disponible }}</span>
+            }
             @if (cantidadDe(producto); as cantidad) {
               <span class="badge" aria-label="ya cargados">{{ cantidad }}</span>
             }

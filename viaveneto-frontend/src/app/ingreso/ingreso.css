@@ -1,0 +1,27 @@
+.ingreso { max-width: 440px; margin: 24px auto 0; text-align: center; }
+h1 { font-size: 2rem; margin-bottom: 8px; }
+.explicacion { color: var(--suave); font-size: 1.15rem; margin: 0 0 16px; }
+.personas { display: grid; gap: 12px; margin-top: 16px; }
+.persona { min-height: 80px; font-size: 1.5rem; }
+.campo { display: flex; flex-direction: column; gap: 6px; text-align: left; font-weight: 600; margin-bottom: 16px; }
+.grande { width: 100%; min-height: 72px; font-size: 1.3rem; }
+
+.puntos { display: flex; justify-content: center; gap: 18px; margin: 12px 0 20px; }
+.puntos span { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--vino); }
+.puntos span.lleno { background: var(--vino); }
+.puntos.error { animation: temblor 0.35s; }
+.puntos.error span { border-color: var(--peligro); }
+
+.teclado { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.teclado button { min-height: 80px; font-size: 2rem; font-weight: 700; border-radius: 18px; }
+.teclado button.chica { font-size: 1rem; }
+.mensaje-error { margin-top: 16px; padding: 14px; border-radius: var(--radio); background: #fde8e6; color: var(--peligro); font-weight: 700; }
+
+@keyframes temblor {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .puntos.error { animation: none; }
+}
