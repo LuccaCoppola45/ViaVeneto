@@ -19,6 +19,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ItemPedido {
 
+	public static final int LARGO_NOTA = 80;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -39,6 +41,10 @@ public class ItemPedido {
 	@Column(nullable = false)
 	private int cantidad;
 
+	/** Pedido especial para la cocina: "sin cebolla", "jugosa"… */
+	@Column(length = LARGO_NOTA)
+	private String nota;
+
 	ItemPedido(Pedido pedido, Producto producto, int cantidad) {
 		this.pedido = pedido;
 		this.producto = producto;
@@ -47,12 +53,30 @@ public class ItemPedido {
 		this.cantidad = cantidad;
 	}
 
-	void sumar(int unidades) {
-		this.cantidad += unidades;
+	/** Una línea nueva igual a otra (mismo precio) pero con su propia nota. */
+	ItemPedido(ItemPedido original, int cantidad, String nota) {
+		this.pedido = original.pedido;
+		this.producto = original.producto;
+		this.nombre = original.nombre;
+		this.precioUnitario = original.precioUnitario;
+		this.cantidad = cantidad;
+		this.nota = nota;
+	}
+
+	boolean esDelMismoProducto(ItemPedido otro) {
+		return producto.getId().equals(otro.producto.getId());
+	}
+
+	boolean tieneNota(String otra) {
+		return nota == null ? otra == null : nota.equals(otra);
 	}
 
 	void cambiarCantidad(int cantidad) {
 		this.cantidad = cantidad;
+	}
+
+	void ponerNota(String nota) {
+		this.nota = nota;
 	}
 
 	public BigDecimal subtotal() {

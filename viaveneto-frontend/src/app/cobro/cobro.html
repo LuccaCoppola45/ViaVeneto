@@ -1,0 +1,118 @@
+<div class="encabezado">
+  <a class="boton" [routerLink]="['/pedidos', id()]">‹ Volver</a>
+  <h1>Cobrar {{ titulo().toLowerCase() }}</h1>
+</div>
+
+@if (pedido(); as p) {
+  @if (cobrada()) {
+    <section class="tarjeta listo">
+      <p class="grande">✅ {{ titulo() }} cobrada</p>
+      <p>Total {{ p.total | plata }}</p>
+      <div class="botones">
+        <button class="primario" (click)="imprimirTicket()">🖨️ Imprimir ticket</button>
+        <a class="boton" routerLink="/mesas">Volver a las mesas</a>
+      </div>
+    </section>
+  } @else {
+    <div class="columnas">
+      <section class="tarjeta resumen">
+        <div class="fila"><span>Consumo</span><span>{{ p.subtotal | plata }}</span></div>
+        <label class="descuento">
+          <input type="checkbox" [checked]="conDescuento()" [disabled]="trabajando()" (change)="cambiarDescuento()" />
+          {{ DESCUENTO_EFECTIVO }}% de descuento por efectivo
+          @if (p.descuento) { <strong>− {{ p.descuento | plata }}</strong> }
+        </label>
+        <div class="fila total"><span>Total</span><span>{{ p.total | plata }}</span></div>
+        @for (pago of p.pagos; track pago.id) {
+          <div class="fila pago">
+            <span>✔ {{ nombreMedio(pago.medio) }}@if (pago.propina) { <small> + propina {{ pago.propina | plata }}</small> }</span>
+            <span>{{ pago.monto | plata }}
+              <button class="borrar" (click)="borrarPago(pago.id)" [disabled]="trabajando()" aria-label="Borrar este pago">✕</button>
+            </span>
+          </div>
+        }
+        <div class="fila falta"><span>Falta cobrar</span><span>{{ saldo() | plata }}</span></div>
+        <button class="precuenta" (click)="imprimirTicket()">🧾 Imprimir precuenta</button>
+      </section>
+
+      <section class="tarjeta pago-nuevo">
+        <h2>1. ¿Cuánto paga?</h2>
+        <div class="segmentos">
+          <button [class.elegido]="forma() === 'todo'" (click)="elegirForma('todo')">Todo junto</button>
+          <button [class.elegido]="forma() === 'partes'" (click)="elegirForma('partes')">Partes iguales</button>
+          <button [class.elegido]="forma() === 'platos'" (click)="elegirForma('platos')">Cada uno lo suyo</button>
+        </div>
+
+        @if (forma() === 'partes') {
+          <div class="contador">
+            <button (click)="cambiarPartes(-1)" [disabled]="partes() <= 1" aria-label="Una persona menos">−</button>
+            <span><strong>{{ partes() }}</strong> {{ partes() === 1 ? 'persona (la última)' : 'personas' }}</span>
+            <button (click)="cambiarPartes(1)" aria-label="Una persona más">+</button>
+          </div>
+          <p class="ayuda">Cada uno paga {{ monto() | plata }}. Cobrá de a uno: el siguiente se calcula solo.</p>
+        }
+
+        @if (forma() === 'platos') {
+          <p class="ayuda">Marcá lo que paga esta persona:</p>
+          <div class="platos">
+            @for (item of p.items; track item.id) {
+              <div class="plato">
+                <span>{{ item.nombre }}@if (item.nota) { <small> · {{ item.nota }}</small> }<small> ({{ item.cantidad }})</small></span>
+                <div class="contador chico">
+                  <button (click)="cambiarElegido(item, -1)" [disabled]="!elegidosDe(item)" aria-label="Uno menos">−</button>
+                  <strong>{{ elegidosDe(item) }}</strong>
+                  <button (click)="cambiarElegido(item, 1)" [disabled]="elegidosDe(item) >= item.cantidad" aria-label="Uno más">+</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <label class="campo">Monto de este pago
+          <input type="number" inputmode="numeric" min="1" [value]="monto() ?? ''" (input)="escribirMonto($any($event.target).value)" />
+        </label>
+
+        <h2>2. ¿Con qué paga?</h2>
+        <div class="medios">
+          @for (m of MEDIOS; track m.medio) {
+            <button [class.elegido]="medio() === m.medio" (click)="elegirMedio(m.medio)">
+              <span class="icono">{{ m.icono }}</span>{{ m.nombre }}
+            </button>
+          }
+        </div>
+
+        @if (medio() === 'EFECTIVO') {
+          <h2>¿Con cuánto paga?</h2>
+          <div class="segmentos billetes">
+            @for (billete of billetes(); track billete) {
+              <button [class.elegido]="recibido() === billete" (click)="recibido.set(billete)">{{ billete | plata }}</button>
+            }
+          </div>
+          <label class="campo">Otro monto
+            <input type="number" inputmode="numeric" min="0" [value]="recibido() ?? ''" (input)="escribirRecibido($any($event.target).value)" />
+          </label>
+          @if (vuelto() !== null) {
+            <p class="vuelto" [class.no-alcanza]="vuelto()! < 0">
+              {{ vuelto()! < 0 ? 'No alcanza: faltan ' : 'Vuelto: ' }}{{ (vuelto()! < 0 ? -vuelto()! : vuelto()!) | plata }}
+            </p>
+          }
+        }
+
+        <details class="propina">
+          <summary>Propina (opcional){{ propina() ? ': ' : '' }}@if (propina()) { {{ propina() | plata }} }</summary>
+          <div class="fila-propina">
+            <input type="number" inputmode="numeric" min="0" [value]="propina() ?? ''" (input)="escribirPropina($any($event.target).value)" placeholder="0" />
+            <button (click)="propinaDiezPorCiento()">10%</button>
+          </div>
+          <p class="ayuda">Se anota aparte: no suma a las ventas.</p>
+        </details>
+
+        <button class="primario cobrar" [disabled]="!puedeCobrar()" (click)="cobrar()">
+          Cobrar {{ (monto() ?? 0) | plata }}@if (medio()) { con {{ nombreMedio(medio()!).toLowerCase() }} }
+        </button>
+      </section>
+    </div>
+  }
+} @else {
+  <p class="cargando">Cargando…</p>
+}

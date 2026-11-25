@@ -5,8 +5,11 @@ import { Avisos } from '../comun/avisos';
 import { PlataPipe } from '../comun/formato';
 import { Categoria, ItemPedido, PedidoDetalle, Producto } from '../comun/modelos';
 import { refrescarCadaRato } from '../comun/refresco';
+import { abrirTicket } from '../ticket/abrir-ticket';
 
 type Vista = 'carta' | 'cuenta';
+
+const NOTAS_RAPIDAS = ['Sin sal', 'Sin cebolla', 'Sin TACC', 'Jugosa', 'A punto', 'Bien cocida', 'Para compartir', 'Aparte'];
 
 @Component({
   selector: 'app-pedido',
@@ -27,6 +30,9 @@ export class PedidoPagina implements OnInit {
   protected readonly vista = signal<Vista>('carta');
   protected readonly confirmandoCierre = signal(false);
   protected readonly cerrando = signal(false);
+  protected readonly editandoNota = signal<ItemPedido | null>(null);
+  protected readonly textoNota = signal('');
+  protected readonly NOTAS_RAPIDAS = NOTAS_RAPIDAS;
 
   protected readonly titulo = computed(() => {
     const etiqueta = this.pedido()?.mesaEtiqueta;
@@ -63,6 +69,30 @@ export class PedidoPagina implements OnInit {
 
   protected cambiar(item: ItemPedido, diferencia: number) {
     this.modificar(() => this.api.cambiarCantidad(this.id(), item.id, item.cantidad + diferencia));
+  }
+
+  protected abrirNota(item: ItemPedido) {
+    this.textoNota.set(item.nota ?? '');
+    this.editandoNota.set(item);
+  }
+
+  protected sumarNotaRapida(rapida: string) {
+    const actual = this.textoNota().trim();
+    this.textoNota.set(actual ? `${actual}, ${rapida.toLowerCase()}` : rapida);
+  }
+
+  protected guardarNota(item: ItemPedido, soloUna: boolean) {
+    const nota = this.textoNota();
+    this.editandoNota.set(null);
+    this.modificar(() => this.api.ponerNota(this.id(), item.id, nota, soloUna));
+  }
+
+  protected imprimirPrecuenta() {
+    abrirTicket(this.id());
+  }
+
+  protected imprimirTicket() {
+    abrirTicket(this.id());
   }
 
   protected async cerrar() {

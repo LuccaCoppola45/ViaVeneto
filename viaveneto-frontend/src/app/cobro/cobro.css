@@ -1,0 +1,49 @@
+.encabezado { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.encabezado h1 { margin: 0; }
+.columnas { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 16px; align-items: start; }
+h2 { margin: 18px 0 10px; font-size: 1.2rem; }
+h2:first-child { margin-top: 0; }
+
+.fila { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; font-variant-numeric: tabular-nums; }
+.fila.total { font-size: 1.4rem; font-weight: 800; border-top: 2px solid var(--borde); }
+.fila.pago { color: var(--libre); font-weight: 700; }
+.fila.falta { font-size: 1.6rem; font-weight: 800; color: var(--ocupada); border-top: 2px solid var(--borde); }
+.borrar { min-height: 36px; padding: 0 10px; margin-left: 6px; font-size: 0.9rem; }
+.descuento { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-weight: 600; }
+.descuento input { width: 28px; height: 28px; }
+.descuento strong { margin-left: auto; color: var(--libre); }
+.precuenta { width: 100%; margin-top: 8px; }
+
+.segmentos { display: flex; flex-wrap: wrap; gap: 8px; }
+.segmentos button { flex: 1 1 140px; }
+button.elegido { background: var(--vino); border-color: var(--vino); color: #fff; }
+.contador { display: flex; align-items: center; gap: 16px; margin-top: 12px; font-size: 1.2rem; }
+.contador button { width: 64px; padding: 0; font-size: 1.6rem; }
+.contador.chico { gap: 8px; margin: 0; }
+.contador.chico button { width: 52px; min-height: 52px; }
+.ayuda { color: var(--suave); margin: 8px 0; }
+.platos { display: grid; gap: 6px; }
+.plato { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--borde); }
+.plato small { color: var(--suave); }
+.campo { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; font-weight: 600; }
+.campo input { font-size: 1.4rem; font-weight: 700; }
+
+.medios { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.medios button { min-height: 84px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.medios .icono { font-size: 1.6rem; }
+.vuelto { margin: 12px 0 0; padding: 14px; border-radius: var(--radio); background: var(--libre-fondo); color: var(--libre); font-size: 1.6rem; font-weight: 800; text-align: center; }
+.vuelto.no-alcanza { background: #fde8e6; color: var(--peligro); }
+
+.propina { margin-top: 16px; }
+.propina summary { cursor: pointer; font-weight: 700; min-height: 48px; display: flex; align-items: center; }
+.fila-propina { display: flex; gap: 8px; }
+.fila-propina input { flex: 1; }
+.cobrar { width: 100%; margin-top: 18px; min-height: 76px; font-size: 1.35rem; }
+
+.listo { text-align: center; }
+.listo .grande { font-size: 1.8rem; font-weight: 800; margin: 8px 0; }
+.botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 16px; }
+
+@media (max-width: 760px) {
+  .columnas { grid-template-columns: minmax(0, 1fr); }
+}

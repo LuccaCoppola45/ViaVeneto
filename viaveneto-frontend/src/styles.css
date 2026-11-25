@@ -51,7 +51,13 @@ button:active:not(:disabled) { transform: scale(0.97); }
 button:disabled { opacity: 0.5; cursor: default; }
 button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
 
-button.primario { background: var(--vino); border-color: var(--vino); color: #fff; }
+/* Links que se ven como botones */
+a.boton {
+  display: inline-flex; align-items: center; justify-content: center; min-height: var(--toque); padding: 0 20px;
+  border-radius: var(--radio); border: 2px solid var(--borde); background: var(--tarjeta);
+  color: var(--texto); font-weight: 600; text-decoration: none;
+}
+button.primario, a.boton.primario { background: var(--vino); border-color: var(--vino); color: #fff; }
 button.primario:hover:not(:disabled) { background: var(--vino-oscuro); }
 button.peligro { background: var(--peligro); border-color: var(--peligro); color: #fff; }
 
@@ -188,4 +194,11 @@ input, select {
   .sectores button { min-height: 60px; padding: 0 14px; font-size: 1rem; }
   .sectores button small { font-size: 0.8rem; }
   .plano { border-width: 4px; }
+}
+
+/* Al imprimir (tickets) no va la barra de arriba ni los avisos */
+@media print {
+  .barra, .aviso, .no-imprimir { display: none !important; }
+  body { background: #fff; }
+  main { padding: 0; max-width: none; }
 }

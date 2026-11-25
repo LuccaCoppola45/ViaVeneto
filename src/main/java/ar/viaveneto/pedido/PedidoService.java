@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ar.viaveneto.caja.CajaService;
 import ar.viaveneto.carta.CartaService;
 import ar.viaveneto.carta.Producto;
 import ar.viaveneto.comun.NoEncontradoException;
@@ -21,6 +22,7 @@ public class PedidoService {
 	private final PedidoRepository pedidos;
 	private final MesaRepository mesas;
 	private final CartaService cartaService;
+	private final CajaService cajaService;
 	private final Clock reloj;
 
 	/** Si la mesa ya estaba abierta devuelve ese pedido en lugar de fallar. */
@@ -55,6 +57,35 @@ public class PedidoService {
 	public PedidoDetalle cambiarCantidad(Long pedidoId, Long itemId, CantidadForm.CambiarCantidad form) {
 		Pedido pedido = paraActualizar(pedidoId);
 		pedido.cambiarCantidad(itemId, form.cantidad());
+		return guardar(pedido);
+	}
+
+	@Transactional
+	public PedidoDetalle ponerNota(Long pedidoId, Long itemId, CantidadForm.Nota form) {
+		Pedido pedido = paraActualizar(pedidoId);
+		pedido.ponerNota(itemId, form.nota(), form.soloUna());
+		return guardar(pedido);
+	}
+
+	@Transactional
+	public PedidoDetalle aplicarDescuento(Long pedidoId, CantidadForm.Descuento form) {
+		Pedido pedido = paraActualizar(pedidoId);
+		pedido.aplicarDescuento(form.porcentaje());
+		return guardar(pedido);
+	}
+
+	/** Registra un pago en el turno de caja abierto (si no hay ninguno, lo abre solo). */
+	@Transactional
+	public PedidoDetalle cobrar(Long pedidoId, CantidadForm.Cobro form) {
+		Pedido pedido = paraActualizar(pedidoId);
+		pedido.cobrar(cajaService.turnoParaCobrar(), form.medio(), form.monto(), form.propina(), form.recibido(), ahora());
+		return guardar(pedido);
+	}
+
+	@Transactional
+	public PedidoDetalle anularPago(Long pedidoId, Long pagoId) {
+		Pedido pedido = paraActualizar(pedidoId);
+		pedido.anularPago(pagoId);
 		return guardar(pedido);
 	}
 

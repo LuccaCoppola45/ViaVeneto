@@ -1,7 +1,20 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
-import { Categoria, MesaResumen, PedidoDetalle, PlanoForm, Producto, ProductoForm, Salon, Sector } from './modelos';
+import {
+  Caja,
+  Categoria,
+  CobroForm,
+  MesaResumen,
+  PedidoDetalle,
+  PlanoForm,
+  Producto,
+  ProductoForm,
+  Salon,
+  Sector,
+  TipoTurno,
+  Turno,
+} from './modelos';
 
 /** Llamadas al backend. Devuelven promesas y los errores llegan como Error con un mensaje listo para mostrar. */
 @Injectable({ providedIn: 'root' })
@@ -28,6 +41,22 @@ export class Api {
     this.pedir(this.http.post<PedidoDetalle>(`/api/pedidos/${pedidoId}/items`, { productoId, cantidad }));
   cambiarCantidad = (pedidoId: number, itemId: number, cantidad: number) =>
     this.pedir(this.http.put<PedidoDetalle>(`/api/pedidos/${pedidoId}/items/${itemId}`, { cantidad }));
+  ponerNota = (pedidoId: number, itemId: number, nota: string, soloUna: boolean) =>
+    this.pedir(this.http.put<PedidoDetalle>(`/api/pedidos/${pedidoId}/items/${itemId}/nota`, { nota, soloUna }));
+  aplicarDescuento = (pedidoId: number, porcentaje: number) =>
+    this.pedir(this.http.put<PedidoDetalle>(`/api/pedidos/${pedidoId}/descuento`, { porcentaje }));
+  cobrar = (pedidoId: number, cobro: CobroForm) =>
+    this.pedir(this.http.post<PedidoDetalle>(`/api/pedidos/${pedidoId}/pagos`, cobro));
+  anularPago = (pedidoId: number, pagoId: number) =>
+    this.pedir(this.http.delete<PedidoDetalle>(`/api/pedidos/${pedidoId}/pagos/${pagoId}`));
+
+  caja = () => this.pedir(this.http.get<Caja>('/api/caja'));
+  turno = (id: number) => this.pedir(this.http.get<Turno>(`/api/caja/turnos/${id}`));
+  abrirTurno = (tipo: TipoTurno, responsable: string, fondoInicial: number) =>
+    this.pedir(this.http.post<Turno>('/api/caja/turnos', { tipo, responsable, fondoInicial }));
+  cerrarTurno = (id: number, efectivoContado: number, observaciones: string) =>
+    this.pedir(this.http.post<Turno>(`/api/caja/turnos/${id}/cerrar`, { efectivoContado, observaciones }));
+
   cerrarPedido = (pedidoId: number) => this.pedir(this.http.post<PedidoDetalle>(`/api/pedidos/${pedidoId}/cerrar`, {}));
 
   carta = (soloActivos = true) => this.pedir(this.http.get<Categoria[]>('/api/carta', { params: { soloActivos } }));

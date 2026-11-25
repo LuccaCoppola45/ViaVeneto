@@ -1,0 +1,117 @@
+<h1>Caja</h1>
+
+@if (!caja()) {
+  <p class="cargando">Cargando…</p>
+} @else {
+  @if (recienCerrado(); as t) {
+    <section class="tarjeta cerrado">
+      <p class="grande">Turno {{ nombreTurno(t.tipo).toLowerCase() }} cerrado</p>
+      <p>
+        Debería haber {{ t.efectivoEsperado | plata }} · Contaste {{ t.efectivoContado | plata }} ·
+        <strong>{{ t.diferencia! > 0 ? 'Sobran ' : t.diferencia! < 0 ? 'Faltan ' : 'Da justo' }}@if (t.diferencia) {{{ (t.diferencia! < 0 ? -t.diferencia! : t.diferencia!) | plata }}}</strong>
+      </p>
+      <button class="primario" (click)="imprimir(t)">🖨️ Imprimir cierre</button>
+    </section>
+  }
+
+  @if (abierto(); as t) {
+    <section class="tarjeta">
+      <div class="cabecera">
+        <div>
+          <p class="grande">Turno {{ nombreTurno(t.tipo).toLowerCase() }} · {{ t.responsable }}</p>
+          <p class="suave">Abierto a las {{ t.abiertoEn | date: 'HH:mm' }}@if (t.automatico) { (se abrió solo con el primer cobro)}</p>
+        </div>
+        @if (!cerrando()) {
+          <button class="primario" (click)="empezarCierre()">Cerrar turno</button>
+        }
+      </div>
+
+      <div class="medios">
+        @for (m of MEDIOS; track m.medio) {
+          <div class="medio">
+            <span class="nombre">{{ m.icono }} {{ m.nombre }}</span>
+            <span class="monto">{{ montoDe(t.resumen, m.medio).monto | plata }}</span>
+            <span class="suave">{{ montoDe(t.resumen, m.medio).cobros }} cobros</span>
+          </div>
+        }
+      </div>
+
+      <div class="totales">
+        <div><span>Total vendido</span><strong>{{ t.resumen.ventas | plata }}</strong></div>
+        <div><span>Mesas cobradas</span><strong>{{ t.resumen.mesasCobradas }}</strong></div>
+        <div><span>Descuentos dados</span><strong>{{ t.resumen.descuentos | plata }}</strong></div>
+        <div class="propinas"><span>Propinas para repartir</span><strong>{{ t.resumen.propinas | plata }}</strong></div>
+      </div>
+
+      <div class="cajon">
+        En el cajón tendría que haber
+        <strong>{{ t.efectivoEsperado | plata }}</strong>
+        <span class="suave">({{ t.fondoInicial | plata }} de cambio + {{ (t.efectivoEsperado - t.fondoInicial) | plata }} cobrado en efectivo, sin propinas)</span>
+      </div>
+
+      @if (cerrando()) {
+        <div class="cierre">
+          <label class="campo">¿Cuánta plata en efectivo contaste en el cajón?
+            <input type="number" inputmode="numeric" min="0" [value]="contado() ?? ''" (input)="escribirNumero('contado', $any($event.target).value)" />
+          </label>
+          @if (diferencia() !== null) {
+            <p class="diferencia" [class.falta]="diferencia()! < 0" [class.sobra]="diferencia()! > 0">
+              @if (diferencia() === 0) { ✅ Da justo } @else if (diferencia()! < 0) { Faltan {{ -diferencia()! | plata }} } @else { Sobran {{ diferencia() | plata }} }
+            </p>
+          }
+          <label class="campo">Nota (opcional)
+            <input [value]="observaciones()" (input)="observaciones.set($any($event.target).value)" maxlength="300"
+                   placeholder="Ej: le di $5.000 al proveedor de pan" />
+          </label>
+          <div class="botones">
+            <button (click)="cerrando.set(false)">Cancelar</button>
+            <button class="primario" [disabled]="contado() === null || trabajando()" (click)="cerrar()">Cerrar turno</button>
+          </div>
+        </div>
+      }
+    </section>
+  } @else {
+    <section class="tarjeta">
+      <p class="grande">Abrir la caja</p>
+      <div class="segmentos">
+        <button [class.elegido]="tipo() === 'MEDIODIA'" (click)="tipo.set('MEDIODIA')">☀️ Mediodía</button>
+        <button [class.elegido]="tipo() === 'NOCHE'" (click)="tipo.set('NOCHE')">🌙 Noche</button>
+      </div>
+      <p class="pregunta">¿Quién está en la caja?</p>
+      <div class="segmentos">
+        @for (nombre of RESPONSABLES; track nombre) {
+          <button [class.elegido]="responsable() === nombre" (click)="responsable.set(nombre)">{{ nombre }}</button>
+        }
+      </div>
+      <input class="otro" [value]="RESPONSABLES.includes(responsable()) ? '' : responsable()"
+             (input)="responsable.set($any($event.target).value)" placeholder="Otro nombre" maxlength="40" />
+      <label class="campo">Cambio que hay en el cajón
+        <input type="number" inputmode="numeric" min="0" [value]="fondo() ?? ''" (input)="escribirNumero('fondo', $any($event.target).value)" />
+      </label>
+      <button class="primario abrir" [disabled]="trabajando()" (click)="abrir()">Abrir caja</button>
+    </section>
+  }
+
+  @if (caja()!.turnosDeHoy.length) {
+    <h2>Hoy</h2>
+    <section class="tarjeta">
+      @for (t of caja()!.turnosDeHoy; track t.id) {
+        <div class="turno-hoy">
+          <span><strong>{{ nombreTurno(t.tipo) }}</strong> · {{ t.responsable }} · {{ t.abiertoEn | date: 'HH:mm' }}@if (t.cerradoEn) { a {{ t.cerradoEn | date: 'HH:mm' }}} @else { (abierto)}</span>
+          <span class="monto">{{ t.resumen.ventas | plata }}</span>
+          @if (t.diferencia !== null) {
+            <span class="dif" [class.falta]="t.diferencia < 0">{{ t.diferencia === 0 ? 'Justo' : t.diferencia < 0 ? 'Faltaron ' : 'Sobraron ' }}@if (t.diferencia) {{{ (t.diferencia < 0 ? -t.diferencia : t.diferencia) | plata }}}</span>
+          }
+          @if (t.cerradoEn) { <button (click)="imprimir(t)">🖨️</button> }
+        </div>
+      }
+      <div class="dia">
+        @for (m of MEDIOS; track m.medio) {
+          <span>{{ m.nombre }}: <strong>{{ montoDe(caja()!.dia, m.medio).monto | plata }}</strong></span>
+        }
+        <span class="total-dia">Total del día: <strong>{{ caja()!.dia.ventas | plata }}</strong></span>
+        <span>Propinas: <strong>{{ caja()!.dia.propinas | plata }}</strong></span>
+      </div>
+    </section>
+  }
+}

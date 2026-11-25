@@ -1,5 +1,6 @@
 package ar.viaveneto.pedido;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,27 @@ public class PedidoController {
 	public PedidoDetalle cambiarCantidad(@PathVariable Long id, @PathVariable Long itemId,
 			@Valid @RequestBody CantidadForm.CambiarCantidad form) {
 		return pedidoService.cambiarCantidad(id, itemId, form);
+	}
+
+	@PutMapping("/{id}/items/{itemId}/nota")
+	public PedidoDetalle ponerNota(@PathVariable Long id, @PathVariable Long itemId,
+			@Valid @RequestBody CantidadForm.Nota form) {
+		return pedidoService.ponerNota(id, itemId, form);
+	}
+
+	@PutMapping("/{id}/descuento")
+	public PedidoDetalle aplicarDescuento(@PathVariable Long id, @Valid @RequestBody CantidadForm.Descuento form) {
+		return pedidoService.aplicarDescuento(id, form);
+	}
+
+	@PostMapping("/{id}/pagos")
+	public PedidoDetalle cobrar(@PathVariable Long id, @Valid @RequestBody CantidadForm.Cobro form) {
+		return pedidoService.cobrar(id, form);
+	}
+
+	@DeleteMapping("/{id}/pagos/{pagoId}")
+	public PedidoDetalle anularPago(@PathVariable Long id, @PathVariable Long pagoId) {
+		return pedidoService.anularPago(id, pagoId);
 	}
 
 	@PostMapping("/{id}/cerrar")

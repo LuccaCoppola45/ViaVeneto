@@ -1,0 +1,24 @@
+/* Impresora térmica de 80 mm: el papel útil es de unos 72 mm */
+@page { size: 80mm auto; margin: 0; }
+
+:host { display: block; }
+
+.papel {
+  width: 72mm; margin: 0 auto; padding: 4mm 2mm 8mm;
+  background: #fff; color: #000;
+  font-family: 'Courier New', ui-monospace, monospace; font-size: 12px; line-height: 1.35;
+}
+.centro { text-align: center; }
+.marca { font-size: 18px; font-weight: 700; letter-spacing: 0.08em; }
+.grande { font-size: 15px; font-weight: 700; }
+.linea { display: flex; justify-content: space-between; gap: 6px; }
+.linea span:last-child { white-space: nowrap; }
+.nota { padding-left: 3ch; font-style: italic; }
+.sub { padding-left: 2ch; }
+.corte { border-top: 1px dashed #000; margin: 6px 0; }
+.chico { font-size: 10px; }
+.acciones { display: flex; gap: 10px; justify-content: center; margin: 16px 0; }
+
+@media screen {
+  .papel { box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2); margin-top: 8px; }
+}

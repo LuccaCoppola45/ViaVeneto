@@ -43,8 +43,16 @@ class MesasYPedidosTest {
 		assertThat(ocupada.ocupada()).isTrue();
 		assertThat(ocupada.cantidadItems()).isEqualTo(5);
 
-		assertThat(pedidoService.cerrar(pedido.id()).estado()).isEqualTo(EstadoPedido.CERRADO);
+		assertThatThrownBy(() -> pedidoService.cerrar(pedidoId(ocupada))).as("no se cierra sin cobrar")
+				.isInstanceOf(ReglaNegocioException.class);
+		PedidoDetalle cobrado = pedidoService.cobrar(pedido.id(),
+				new CantidadForm.Cobro(MedioPago.EFECTIVO, pedido.total(), null, null));
+		assertThat(cobrado.estado()).as("al cobrar todo se cierra sola").isEqualTo(EstadoPedido.CERRADO);
 		assertThat(mesaService.listar().getFirst().ocupada()).isFalse();
+	}
+
+	private static Long pedidoId(MesaResumen mesa) {
+		return mesa.pedidoId();
 	}
 
 	@Test
@@ -71,8 +79,8 @@ class MesasYPedidosTest {
 	void noSePuedeCargarEnUnPedidoCerrado() {
 		PedidoDetalle pedido = pedidoService.abrirMesa(mesaService.listar().getFirst().id());
 		Long productoId = producto("Tiramisú").id();
-		pedidoService.agregarItem(pedido.id(), new CantidadForm.AgregarItem(productoId, 1));
-		pedidoService.cerrar(pedido.id());
+		PedidoDetalle conAlgo = pedidoService.agregarItem(pedido.id(), new CantidadForm.AgregarItem(productoId, 1));
+		pedidoService.cobrar(pedido.id(), new CantidadForm.Cobro(MedioPago.DEBITO, conAlgo.total(), null, null));
 
 		assertThatThrownBy(() -> pedidoService.agregarItem(pedido.id(), new CantidadForm.AgregarItem(productoId, 1)))
 				.isInstanceOf(ReglaNegocioException.class);

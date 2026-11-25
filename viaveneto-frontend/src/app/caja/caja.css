@@ -1,0 +1,34 @@
+.grande { font-size: 1.4rem; font-weight: 800; margin: 0 0 4px; }
+.suave { color: var(--suave); margin: 0; }
+.cabecera { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+.medios { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.medio { display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: var(--radio); background: var(--fondo); }
+.medio .nombre { font-weight: 700; }
+.medio .monto, .monto { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.totales { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px 16px; margin: 16px 0; }
+.totales div { display: flex; flex-direction: column; }
+.totales strong { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.propinas strong { color: var(--libre); }
+.cajon { padding: 14px; border-radius: var(--radio); background: var(--libre-fondo); font-weight: 600; }
+.cajon strong { font-size: 1.5rem; margin: 0 6px; }
+.cierre { margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--borde); }
+.campo { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; font-weight: 600; }
+.campo input { font-size: 1.3rem; }
+.diferencia { margin: 12px 0 0; padding: 14px; border-radius: var(--radio); text-align: center; font-size: 1.6rem; font-weight: 800; background: var(--libre-fondo); color: var(--libre); }
+.diferencia.falta { background: #fde8e6; color: var(--peligro); }
+.diferencia.sobra { background: #fff6d6; color: #8a6400; }
+.botones { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+.segmentos { display: flex; flex-wrap: wrap; gap: 8px; }
+.segmentos button { flex: 1 1 140px; font-size: 1.15rem; }
+button.elegido { background: var(--vino); border-color: var(--vino); color: #fff; }
+.pregunta { font-weight: 700; margin: 16px 0 8px; }
+.otro { width: 100%; margin-top: 8px; }
+.abrir { width: 100%; margin-top: 18px; min-height: 72px; font-size: 1.3rem; }
+.cerrado { margin-bottom: 16px; border: 2px solid var(--libre); }
+.turno-hoy { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 0; border-bottom: 1px solid var(--borde); }
+.turno-hoy .monto { margin-left: auto; font-size: 1.2rem; }
+.dif { font-weight: 700; color: var(--libre); }
+.dif.falta { color: var(--peligro); }
+.turno-hoy button { min-height: 44px; padding: 0 12px; }
+.dia { display: flex; flex-wrap: wrap; gap: 8px 20px; padding-top: 12px; }
+.total-dia { font-size: 1.15rem; }

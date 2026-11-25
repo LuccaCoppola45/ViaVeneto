@@ -34,5 +34,5 @@ Lo usan personas sin conocimientos técnicos: botones grandes, pocos pasos, espa
 - [x] Plano del local por sector (planta baja 5, arriba 4, cerramiento 6, afuera 4) y modo "Acomodar salón".
 - [ ] Parte 2: para llevar y delivery.
 - [ ] Parte 3: stock y alertas.
-- [ ] Parte 4: ticket, medios de pago y caja del día.
+- [x] Parte 4: cobro (dividir la cuenta, medios de pago, vuelto, propina aparte, 10% por efectivo), ticket y precuenta de 80 mm, notas por plato y caja por turnos (mediodía y noche) con cierre y diferencia.
 - [ ] Antes de subir a Render: login (está pensado para la red pública).

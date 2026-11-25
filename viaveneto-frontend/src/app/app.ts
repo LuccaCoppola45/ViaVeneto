@@ -10,6 +10,7 @@ import { Avisos } from './comun/avisos';
       <a class="marca" routerLink="/mesas">Via Veneto</a>
       <nav>
         <a routerLink="/mesas" routerLinkActive="activo">Mesas</a>
+        <a routerLink="/caja" routerLinkActive="activo">Caja</a>
         <a routerLink="/carta" routerLinkActive="activo">Carta y mesas</a>
       </nav>
     </header>

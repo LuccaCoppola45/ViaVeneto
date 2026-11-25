@@ -52,7 +52,11 @@
         <div class="item">
           <div class="item-texto">
             <span class="nombre">{{ item.nombre }}</span>
+            @if (item.nota) { <span class="nota">📝 {{ item.nota }}</span> }
             <span class="sub">{{ item.precioUnitario | plata }} c/u</span>
+            @if (abierto()) {
+              <button class="boton-nota" (click)="abrirNota(item)">{{ item.nota ? 'Cambiar nota' : '+ Nota' }}</button>
+            }
           </div>
           <div class="cantidad">
             <button [disabled]="!abierto()" (click)="cambiar(item, -1)" [attr.aria-label]="'Sacar uno de ' + item.nombre">−</button>
@@ -64,14 +68,29 @@
       } @empty {
         <p class="vacio">Todavía no se cargó nada. Tocá los productos para agregarlos.</p>
       }
+      @if (pedido()!.descuento) {
+        <div class="linea-total"><span>Subtotal</span><span>{{ pedido()!.subtotal | plata }}</span></div>
+        <div class="linea-total"><span>Descuento {{ pedido()!.descuentoPorcentaje }}%</span><span>− {{ pedido()!.descuento | plata }}</span></div>
+      }
       <div class="total">
         <span>Total</span>
         <span>{{ pedido()!.total | plata }}</span>
       </div>
+      @if (pedido()!.pagado && abierto()) {
+        <div class="linea-total pagado"><span>Ya pagaron</span><span>{{ pedido()!.pagado | plata }}</span></div>
+        <div class="linea-total falta"><span>Falta</span><span>{{ pedido()!.saldo | plata }}</span></div>
+      }
       @if (abierto()) {
-        <button class="primario cerrar" (click)="confirmandoCierre.set(true)">
-          {{ pedido()!.items.length ? 'Cerrar mesa' : 'Liberar mesa' }}
-        </button>
+        @if (pedido()!.items.length) {
+          <div class="acciones-cuenta">
+            <button (click)="imprimirPrecuenta()">🧾 Precuenta</button>
+            <a class="boton primario" [routerLink]="['/pedidos', pedido()!.id, 'cobrar']">💵 Cobrar</a>
+          </div>
+        } @else {
+          <button class="cerrar" (click)="confirmandoCierre.set(true)">Liberar mesa</button>
+        }
+      } @else if (pedido()!.estado === 'CERRADO') {
+        <button class="cerrar" (click)="imprimirTicket()">🖨️ Imprimir ticket</button>
       }
     </section>
   </div>
@@ -89,16 +108,40 @@
 @if (confirmandoCierre()) {
   <div class="fondo-modal" (click)="confirmandoCierre.set(false)">
     <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-      @if (pedido()!.items.length) {
-        <p>¿Cerrar la {{ titulo().toLowerCase() }}?</p>
-        <p class="total-modal">Total: <strong>{{ pedido()!.total | plata }}</strong></p>
-      } @else {
-        <p>La {{ titulo().toLowerCase() }} no tiene nada cargado. ¿Liberarla?</p>
-      }
+      <p>La {{ titulo().toLowerCase() }} no tiene nada cargado. ¿Liberarla?</p>
       <div class="acciones">
         <button (click)="confirmandoCierre.set(false)" [disabled]="cerrando()">No, volver</button>
-        <button class="primario" (click)="cerrar()" [disabled]="cerrando()">Sí, cerrar</button>
+        <button class="primario" (click)="cerrar()" [disabled]="cerrando()">Sí, liberar</button>
       </div>
+    </div>
+  </div>
+}
+
+@if (editandoNota(); as item) {
+  <div class="fondo-modal" (click)="editandoNota.set(null)">
+    <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <p><strong>Nota para {{ item.nombre }}</strong></p>
+      <div class="chips">
+        @for (rapida of NOTAS_RAPIDAS; track rapida) {
+          <button (click)="sumarNotaRapida(rapida)">{{ rapida }}</button>
+        }
+      </div>
+      <input class="texto-nota" [value]="textoNota()" (input)="textoNota.set($any($event.target).value)"
+             maxlength="80" placeholder="O escribí lo que pidan" />
+      @if (item.cantidad > 1) {
+        <div class="acciones">
+          <button (click)="guardarNota(item, true)">Solo para 1</button>
+          <button class="primario" (click)="guardarNota(item, false)">Para las {{ item.cantidad }}</button>
+        </div>
+      } @else {
+        <div class="acciones">
+          <button (click)="editandoNota.set(null)">Cancelar</button>
+          <button class="primario" (click)="guardarNota(item, false)">Guardar</button>
+        </div>
+      }
+      @if (item.nota) {
+        <button class="sacar-nota" (click)="textoNota.set(''); guardarNota(item, false)">Sacar la nota</button>
+      }
     </div>
   </div>
 }
