@@ -26,7 +26,9 @@ public record PedidoDetalle(
 		List<PagoVista> pagos,
 		BigDecimal pagado,
 		/** Lo que falta cobrar. */
-		BigDecimal saldo) {
+		BigDecimal saldo,
+		/** Ya se hizo la factura en la registradora. */
+		boolean facturado) {
 
 	public record Item(Long id, Long productoId, String nombre, String nota, BigDecimal precioUnitario, int cantidad,
 			BigDecimal subtotal) {
@@ -51,6 +53,7 @@ public record PedidoDetalle(
 		return new PedidoDetalle(pedido.getId(), pedido.getTipo(), pedido.getEstado(), pedido.titulo(), mesaEtiqueta,
 				pedido.getCliente(), pedido.getEntrega(), atiendeId, atiendeNombre,
 				pedido.getAbiertoEn(), pedido.getCerradoEn(), items, pedido.subtotal(), pedido.getDescuentoPorcentaje(),
-				pedido.descuento(), pedido.total(), pagos, pedido.pagado(), pedido.saldo());
+				pedido.descuento(), pedido.total(), pagos, pedido.pagado(), pedido.saldo(),
+				pedido.isFacturado());
 	}
 }

@@ -99,6 +99,14 @@ export class PedidoPagina implements OnInit {
     abrirTicket(this.id());
   }
 
+  protected async marcarFacturado(facturado: boolean) {
+    try {
+      this.pedido.set(await this.api.marcarFacturado(this.id(), facturado));
+    } catch (error) {
+      this.avisos.error((error as Error).message);
+    }
+  }
+
   /** Cuando una moza le pasa la mesa a otra. */
   protected pasarA(usuarioId: string) {
     this.modificar(() => this.api.pasarA(this.id(), Number(usuarioId)));

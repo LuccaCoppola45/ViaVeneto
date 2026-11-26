@@ -30,6 +30,12 @@ import { Turno } from '../comun/modelos';
         <div class="linea grande"><span>VENTAS</span><span>{{ t.resumen.ventas | plata }}</span></div>
         <div class="linea"><span>Pedidos cobrados</span><span>{{ t.resumen.mesasCobradas }}</span></div>
         @if (t.resumen.descuentos) { <div class="linea"><span>Descuentos</span><span>{{ t.resumen.descuentos | plata }}</span></div> }
+        @if (t.resumen.sinFacturar.length) {
+          <div class="linea grande"><span>SIN FACTURAR</span><span>{{ t.resumen.sinFacturar.length }}</span></div>
+          @for (s of t.resumen.sinFacturar; track s.pedidoId) {
+            <div class="linea sub"><span>{{ s.titulo }}</span><span>{{ s.total | plata }}</span></div>
+          }
+        }
         <div class="linea"><span>Propinas (aparte)</span><span>{{ t.resumen.propinas | plata }}</span></div>
         <div class="corte"></div>
         <div class="linea"><span>Cambio inicial</span><span>{{ t.fondoInicial | plata }}</span></div>

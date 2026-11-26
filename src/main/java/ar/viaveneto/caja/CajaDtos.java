@@ -19,12 +19,17 @@ public final class CajaDtos {
 	public record PorMedio(MedioPago medio, int cobros, BigDecimal monto, BigDecimal propina) {
 	}
 
+	/** Un pedido cobrado al que todavía no se le hizo la factura en la registradora. */
+	public record SinFacturar(Long pedidoId, String titulo, BigDecimal total) {
+	}
+
 	public record Resumen(
 			List<PorMedio> porMedio,
 			BigDecimal ventas,
 			BigDecimal propinas,
 			BigDecimal descuentos,
-			int mesasCobradas) {
+			int mesasCobradas,
+			List<SinFacturar> sinFacturar) {
 	}
 
 	public record TurnoVista(

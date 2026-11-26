@@ -82,6 +82,11 @@ public class Pedido {
 	@OrderBy("id")
 	private List<Pago> pagos = new ArrayList<>();
 
+	/** Si ya se hizo la factura en la registradora fiscal (que funciona aparte, sin conexión). */
+	@Column(nullable = false)
+	@ColumnDefault("false")
+	private boolean facturado;
+
 	/** Por ejemplo 10 cuando pagan en efectivo. Se aplica sobre toda la cuenta. */
 	@Column(nullable = false)
 	@ColumnDefault("0")
@@ -111,6 +116,13 @@ public class Pedido {
 		pedido.estado = EstadoPedido.ABIERTO;
 		pedido.abiertoEn = ahora;
 		return pedido;
+	}
+
+	public void marcarFacturado(boolean facturado) {
+		if (estado != EstadoPedido.CERRADO) {
+			throw new ReglaNegocioException("Se factura cuando ya está cobrado.");
+		}
+		this.facturado = facturado;
 	}
 
 	public void pasarA(Usuario otra) {

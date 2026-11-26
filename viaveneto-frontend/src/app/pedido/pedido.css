@@ -70,3 +70,5 @@
 .atiende select { min-height: 48px; }
 .entrega { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
 .entrega button.elegido { background: var(--libre); border-color: var(--libre); color: #fff; }
+.facturado { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-weight: 700; }
+.facturado input { width: 28px; height: 28px; }

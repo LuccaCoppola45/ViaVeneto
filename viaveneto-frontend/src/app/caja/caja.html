@@ -43,6 +43,21 @@
         <div class="propinas"><span>Propinas para repartir</span><strong>{{ t.resumen.propinas | plata }}</strong></div>
       </div>
 
+      @if (t.resumen.sinFacturar.length) {
+        <div class="sin-facturar">
+          <p><strong>🧾 Falta facturar en la registradora ({{ t.resumen.sinFacturar.length }})</strong></p>
+          @for (pendiente of t.resumen.sinFacturar; track pendiente.pedidoId) {
+            <div class="pendiente">
+              <span>{{ pendiente.titulo }}</span>
+              <strong>{{ pendiente.total | plata }}</strong>
+              <button [disabled]="trabajando()" (click)="facturado(pendiente.pedidoId)">✓ Ya lo facturé</button>
+            </div>
+          }
+        </div>
+      } @else if (t.resumen.mesasCobradas) {
+        <p class="todo-facturado">✅ Todo lo cobrado está facturado</p>
+      }
+
       <div class="cajon">
         En el cajón tendría que haber
         <strong>{{ t.efectivoEsperado | plata }}</strong>
@@ -54,6 +69,9 @@
           <label class="campo">¿Cuánta plata en efectivo contaste en el cajón?
             <input type="number" inputmode="numeric" min="0" [value]="contado() ?? ''" (input)="escribirNumero('contado', $any($event.target).value)" />
           </label>
+          @if (t.resumen.sinFacturar.length) {
+            <p class="aviso-facturar">Ojo: quedan {{ t.resumen.sinFacturar.length }} pedidos sin facturar. Revisalos arriba antes de cerrar.</p>
+          }
           @if (diferencia() !== null) {
             <p class="diferencia" [class.falta]="diferencia()! < 0" [class.sobra]="diferencia()! > 0">
               @if (diferencia() === 0) { ✅ Da justo } @else if (diferencia()! < 0) { Faltan {{ -diferencia()! | plata }} } @else { Sobran {{ diferencia() | plata }} }

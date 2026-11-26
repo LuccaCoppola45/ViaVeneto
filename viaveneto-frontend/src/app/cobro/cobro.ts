@@ -163,6 +163,10 @@ export class Cobro implements OnInit {
     });
   }
 
+  protected async marcarFacturado(facturado: boolean) {
+    await this.trabajar(async () => this.actualizar(await this.api.marcarFacturado(this.id(), facturado)));
+  }
+
   protected imprimirTicket() {
     abrirTicket(this.id());
   }

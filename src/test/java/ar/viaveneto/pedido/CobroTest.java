@@ -98,6 +98,20 @@ class CobroTest {
 	}
 
 	@Test
+	void laCajaMuestraLoCobradoSinFacturarHastaQueSeMarca() {
+		PedidoDetalle pedido = mesaConMilanesas(1);
+		assertThatThrownBy(() -> pedidoService.marcarFacturado(pedido.id(), new CantidadForm.Facturado(true)))
+				.as("sin cobrar no se factura").isInstanceOf(ReglaNegocioException.class);
+
+		pedidoService.cobrar(pedido.id(), cobro(MedioPago.DEBITO, 18000, 0, null));
+		assertThat(cajaService.caja().turnoAbierto().resumen().sinFacturar())
+				.extracting(s -> s.pedidoId()).containsExactly(pedido.id());
+
+		assertThat(pedidoService.marcarFacturado(pedido.id(), new CantidadForm.Facturado(true)).facturado()).isTrue();
+		assertThat(cajaService.caja().turnoAbierto().resumen().sinFacturar()).isEmpty();
+	}
+
+	@Test
 	void siNadieAbrioLaCajaSeAbreSolaAlCobrar() {
 		PedidoDetalle pedido = mesaConMilanesas(1);
 		pedidoService.cobrar(pedido.id(), cobro(MedioPago.DEBITO, 18000, 0, null));

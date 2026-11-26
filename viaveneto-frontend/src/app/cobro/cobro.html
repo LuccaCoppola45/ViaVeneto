@@ -8,6 +8,17 @@
     <section class="tarjeta listo">
       <p class="grande">✅ {{ titulo() }}{{ p.tipo === 'MESA' ? ' cobrada' : ': cobrado' }}</p>
       <p>Total {{ p.total | plata }}</p>
+      @if (p.facturado) {
+        <div class="facturar hecho">
+          <p>✅ Facturado en la registradora</p>
+          <button (click)="marcarFacturado(false)" [disabled]="trabajando()">Me equivoqué, todavía no</button>
+        </div>
+      } @else {
+        <div class="facturar">
+          <p>🧾 Facturá <strong>{{ p.total | plata }}</strong> en la registradora</p>
+          <button class="primario" (click)="marcarFacturado(true)" [disabled]="trabajando()">✓ Ya lo facturé</button>
+        </div>
+      }
       <div class="botones">
         <button class="primario" (click)="imprimirTicket()">🖨️ Imprimir ticket</button>
         <a class="boton" routerLink="/mesas">Volver a las mesas</a>

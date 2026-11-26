@@ -115,6 +115,10 @@
         }
       } @else if (pedido()!.estado === 'CERRADO') {
         <button class="cerrar" (click)="imprimirTicket()">🖨️ Imprimir ticket</button>
+        <label class="facturado">
+          <input type="checkbox" [checked]="pedido()!.facturado" (change)="marcarFacturado($any($event.target).checked)" />
+          Facturado en la registradora
+        </label>
       }
     </section>
   </div>

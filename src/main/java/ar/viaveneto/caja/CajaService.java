@@ -20,6 +20,7 @@ import ar.viaveneto.caja.CajaDtos.CajaVista;
 import ar.viaveneto.caja.CajaDtos.CerrarTurno;
 import ar.viaveneto.caja.CajaDtos.PorMedio;
 import ar.viaveneto.caja.CajaDtos.Resumen;
+import ar.viaveneto.caja.CajaDtos.SinFacturar;
 import ar.viaveneto.caja.CajaDtos.Sugerencia;
 import ar.viaveneto.caja.CajaDtos.TurnoVista;
 import ar.viaveneto.comun.NoEncontradoException;
@@ -135,7 +136,12 @@ public class CajaService {
 				.filter(p -> p.getEstado() == EstadoPedido.CERRADO)
 				.map(Pedido::descuento)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
-		return new Resumen(lineas, sumar(lista, Pago::getMonto), sumar(lista, Pago::getPropina), descuentos, pedidos.size());
+		List<SinFacturar> sinFacturar = pedidos.stream()
+				.filter(p -> p.getEstado() == EstadoPedido.CERRADO && !p.isFacturado())
+				.map(p -> new SinFacturar(p.getId(), p.titulo(), p.total()))
+				.toList();
+		return new Resumen(lineas, sumar(lista, Pago::getMonto), sumar(lista, Pago::getPropina), descuentos, pedidos.size(),
+				sinFacturar);
 	}
 
 	private Map<Long, List<Pago>> pagosDe(Collection<Long> turnoIds) {

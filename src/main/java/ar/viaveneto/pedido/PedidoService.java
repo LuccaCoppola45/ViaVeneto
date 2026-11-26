@@ -71,6 +71,13 @@ public class PedidoService {
 		return guardar(pedido);
 	}
 
+	@Transactional
+	public PedidoDetalle marcarFacturado(Long pedidoId, CantidadForm.Facturado form) {
+		Pedido pedido = paraActualizar(pedidoId);
+		pedido.marcarFacturado(form.facturado());
+		return guardar(pedido);
+	}
+
 	/** Cuando una moza le pasa la mesa a otra. */
 	@Transactional
 	public PedidoDetalle pasarA(Long pedidoId, CantidadForm.Atiende form) {

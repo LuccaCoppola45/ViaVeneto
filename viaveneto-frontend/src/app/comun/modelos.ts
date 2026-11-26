@@ -72,6 +72,8 @@ export type PedidoDetalle = {
   pagado: number;
   /** Lo que falta cobrar. */
   saldo: number;
+  /** Ya se hizo la factura en la registradora fiscal. */
+  facturado: boolean;
 };
 
 export type CobroForm = { medio: MedioPago; monto: number; propina: number; recibido: number | null };
@@ -86,6 +88,8 @@ export type ResumenCaja = {
   propinas: number;
   descuentos: number;
   mesasCobradas: number;
+  /** Pedidos cobrados a los que todavía no se les hizo la factura en la registradora. */
+  sinFacturar: { pedidoId: number; titulo: string; total: number }[];
 };
 
 export type Turno = {

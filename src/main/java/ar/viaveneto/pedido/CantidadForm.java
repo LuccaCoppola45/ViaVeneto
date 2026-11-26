@@ -29,6 +29,9 @@ public final class CantidadForm {
 			@Size(max = 60, message = "El nombre es muy largo (máximo 60 letras).") String cliente) {
 	}
 
+	public record Facturado(boolean facturado) {
+	}
+
 	public record Entrega(@NotNull(message = "Elegí el estado.") EstadoEntrega estado) {
 	}
 

@@ -31,3 +31,10 @@
 .turno-hoy button { min-height: 44px; padding: 0 12px; }
 .dia { display: flex; flex-wrap: wrap; gap: 8px 20px; padding-top: 12px; }
 .total-dia { font-size: 1.15rem; }
+.sin-facturar { margin: 16px 0; padding: 14px; border-radius: var(--radio); background: #fff6d6; border: 2px solid #e0b100; }
+.sin-facturar p { margin: 0 0 8px; }
+.pendiente { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 6px 0; border-top: 1px solid #ecd9a0; }
+.pendiente span { flex: 1 1 160px; }
+.pendiente button { min-height: 48px; }
+.todo-facturado { color: var(--libre); font-weight: 700; }
+.aviso-facturar { margin: 12px 0 0; padding: 12px; border-radius: var(--radio); background: #fff6d6; font-weight: 700; color: #8a6400; }

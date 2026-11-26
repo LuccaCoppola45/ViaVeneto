@@ -76,6 +76,8 @@ export class Api {
     this.pedir(this.http.post<PedidoDetalle>('/api/pedidos/sin-mesa', { tipo, cliente }));
   marcarEntrega = (pedidoId: number, estado: EstadoEntrega) =>
     this.pedir(this.http.put<PedidoDetalle>(`/api/pedidos/${pedidoId}/entrega`, { estado }));
+  marcarFacturado = (pedidoId: number, facturado: boolean) =>
+    this.pedir(this.http.put<PedidoDetalle>(`/api/pedidos/${pedidoId}/facturado`, { facturado }));
   pasarA = (pedidoId: number, usuarioId: number) =>
     this.pedir(this.http.put<PedidoDetalle>(`/api/pedidos/${pedidoId}/atiende`, { usuarioId }));
 

@@ -39,6 +39,11 @@ public class PedidoController {
 		return pedidoService.marcarEntrega(id, form);
 	}
 
+	@PutMapping("/{id}/facturado")
+	public PedidoDetalle marcarFacturado(@PathVariable Long id, @RequestBody CantidadForm.Facturado form) {
+		return pedidoService.marcarFacturado(id, form);
+	}
+
 	@PutMapping("/{id}/atiende")
 	public PedidoDetalle pasarA(@PathVariable Long id, @Valid @RequestBody CantidadForm.Atiende form) {
 		return pedidoService.pasarA(id, form);

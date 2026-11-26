@@ -91,6 +91,13 @@ export class CajaPagina {
     });
   }
 
+  protected async facturado(pedidoId: number) {
+    await this.trabajar(async () => {
+      await this.api.marcarFacturado(pedidoId, true);
+      await this.cargar(false);
+    });
+  }
+
   protected imprimir(turno: Turno) {
     abrirCierreDeTurno(turno.id);
   }
